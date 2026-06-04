@@ -144,7 +144,7 @@ bez wychodzenia z IDE.
 
 ### 📂 Jak używać wtyczki?
 1️⃣ **Uruchom testy**, które zapisują wyniki do `allure-results`.  
-2️⃣ W **dolnym panelu IntelliJ** przejdź do zakładki **"Allure"**.  
+2️⃣ W **dolnym panelu IDE** przejdź do zakładki **"Allure"**.  
 3️⃣ Kliknij **"Generate Report"**, aby zobaczyć wyniki w IDE.  
 4️⃣ Możesz nawigować po testach, sprawdzać błędy i załączniki.
 
