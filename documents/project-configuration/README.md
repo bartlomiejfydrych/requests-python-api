@@ -17,6 +17,9 @@
 4. [📚Dependencies — Opis](#dependencies--opis)
    - [pytest](#pytest)
    - [requests](#requests)
+   - [pydantic](#pydantic)
+   - [Faker](#faker)
+   - [assertpy](#assertpy)
 
 ---
 
@@ -787,3 +790,990 @@ W projektach wymagających wysokiej współbieżności często stosuje się np. 
 **requests** – biblioteka Pythona służąca do wykonywania żądań HTTP (GET, POST, PUT, DELETE itd.) oraz komunikacji
 z API i serwerami [WWW](http://WWW). Umożliwia wygodne wysyłanie danych, obsługę odpowiedzi, nagłówków, uwierzytelniania,
 sesji i błędów sieciowych. Jest powszechnie wykorzystywana w automatyzacji testów API oraz integracji systemów.
+
+## 📕pydantic
+
+**Pydantic** to biblioteka Pythona służąca do **walidacji, parsowania i serializacji danych** na podstawie adnotacji
+typów (type hints). Zamiast ręcznie sprawdzać poprawność danych wejściowych, definiujesz model danych, a Pydantic
+automatycznie weryfikuje i konwertuje otrzymane wartości.
+
+Jest szczególnie popularna w aplikacjach backendowych, API oraz frameworku FastAPI, gdzie służy do walidacji danych
+przychodzących i wychodzących.
+
+### Czym jest Pydantic?
+
+Najprościej:
+
+> Pydantic pozwala zamienić nieuporządkowane dane (np. JSON z API) na typowane obiekty Pythona z automatyczną walidacją.
+
+Bez Pydantic:
+
+```python
+data = {
+    "id": "1",
+    "name": "Jan"
+}
+
+if not isinstance(data["id"], int):
+    ...
+```
+
+Z Pydantic:
+
+```python
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+
+user = User(
+    id="1",
+    name="Jan"
+)
+```
+
+Pydantic automatycznie przekonwertuje `"1"` na `1`.
+
+### Instalacja
+
+```bash
+pip install pydantic
+```
+
+### Podstawowy model
+
+```python
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+    active: bool
+```
+
+Tworzenie obiektu:
+
+```python
+user = User(
+    id="123",
+    name="Jan",
+    active="true"
+)
+```
+
+Wynik:
+
+```python
+User(
+    id=123,
+    name='Jan',
+    active=True
+)
+```
+
+Pydantic potrafi automatycznie konwertować wiele popularnych typów danych.
+
+### Walidacja danych
+
+Jeżeli dane są niepoprawne:
+
+```python
+User(
+    id="abc",
+    name="Jan",
+    active=True
+)
+```
+
+otrzymasz wyjątek:
+
+```python
+ValidationError
+```
+
+z informacją:
+
+* które pole jest błędne,
+* jaka wartość została przekazana,
+* jaki typ był oczekiwany.
+
+### Obsługa JSON
+
+Bardzo częsty scenariusz w testach API.
+
+Odpowiedź:
+
+```json
+{
+  "id": 1,
+  "name": "Jan"
+}
+```
+
+Model:
+
+```python
+class User(BaseModel):
+    id: int
+    name: str
+```
+
+Walidacja:
+
+```python
+user = User.model_validate(
+    response.json()
+)
+```
+
+Dzięki temu od razu wiadomo, czy API zwróciło dane zgodne z oczekiwanym kontraktem.
+
+### Zagnieżdżone modele
+
+```python
+from pydantic import BaseModel
+
+class Address(BaseModel):
+    city: str
+    zip_code: str
+
+class User(BaseModel):
+    id: int
+    name: str
+    address: Address
+```
+
+Przykład:
+
+```python
+user = User(
+    id=1,
+    name="Jan",
+    address={
+        "city": "Gdańsk",
+        "zip_code": "80-001"
+    }
+)
+```
+
+Pydantic automatycznie utworzy obiekt `Address`.
+
+### Ograniczenia i reguły pól
+
+Można definiować dodatkowe wymagania:
+
+```python
+from pydantic import BaseModel, Field
+
+class User(BaseModel):
+    name: str = Field(
+        min_length=3,
+        max_length=50
+    )
+```
+
+Przykłady:
+
+* minimalna długość,
+* maksymalna długość,
+* zakres liczb,
+* regex,
+* wartości obowiązkowe.
+
+### Typy specjalne
+
+Pydantic dostarcza wiele gotowych typów:
+
+```python
+from pydantic import EmailStr
+
+class User(BaseModel):
+    email: EmailStr
+```
+
+Inne przykłady:
+
+* adresy e-mail,
+* URL,
+* UUID,
+* IPv4/IPv6,
+* daty i czasy,
+* dodatnie liczby (`PositiveInt`).
+
+### Serializacja
+
+Model można łatwo zamienić na słownik:
+
+```python
+user.model_dump()
+```
+
+wynik:
+
+```python
+{
+    "id": 1,
+    "name": "Jan"
+}
+```
+
+lub JSON:
+
+```python
+user.model_dump_json()
+```
+
+### Najczęstsze zastosowania w QA
+
+#### 1. Walidacja odpowiedzi API
+
+```python
+class User(BaseModel):
+    id: int
+    name: str
+
+user = User.model_validate(
+    response.json()
+)
+```
+
+Test przejdzie tylko wtedy, gdy odpowiedź ma poprawną strukturę.
+
+#### 2. Testowanie kontraktów API
+
+Zamiast:
+
+```python
+assert "id" in response.json()
+assert "name" in response.json()
+```
+
+można użyć:
+
+```python
+User.model_validate(
+    response.json()
+)
+```
+
+Kod jest krótszy i bardziej czytelny.
+
+#### 3. Dane testowe
+
+```python
+test_user = User(
+    id=1,
+    name="Jan"
+)
+```
+
+Masz pewność, że dane testowe są poprawne jeszcze przed wysłaniem ich do API.
+
+### Współpraca z pytest i requests
+
+Bardzo często spotykany zestaw:
+
+* pytest – uruchamia testy,
+* Requests – wykonuje żądania HTTP,
+* Pydantic – waliduje odpowiedzi API.
+
+Przykład:
+
+```python
+import requests
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+
+def test_user():
+    response = requests.get(
+        "https://api.example.com/users/1"
+    )
+
+    user = User.model_validate(
+        response.json()
+    )
+
+    assert user.id == 1
+```
+
+### Dlaczego jest tak popularny?
+
+Główne zalety:
+
+* wykorzystuje type hints,
+* eliminuje dużą część ręcznej walidacji,
+* generuje czytelne błędy,
+* bardzo dobrze współpracuje z IDE,
+* potrafi generować schematy JSON Schema,
+* jest szybki (rdzeń walidacji napisany w Rust).
+
+### Krótka definicja do notatek
+
+**Pydantic** – biblioteka Pythona służąca do definiowania modeli danych oraz automatycznej walidacji, konwersji
+i serializacji danych na podstawie type hints. Jest powszechnie używana do walidacji odpowiedzi API, testów
+kontraktowych oraz obsługi danych wejściowych w aplikacjach backendowych.
+
+## 📕Faker
+
+**Faker** to biblioteka Pythona służąca do **generowania realistycznych danych testowych**. Pozwala automatycznie
+tworzyć losowe imiona, nazwiska, adresy, numery telefonów, adresy e-mail, daty, numery kart płatniczych, nazwy firm
+i wiele innych typów danych.
+
+Jest bardzo popularna w testach automatycznych, seedowaniu baz danych oraz tworzeniu danych testowych do API.
+
+### Czym jest Faker?
+
+Zamiast ręcznie tworzyć dane:
+
+```python
+user = {
+    "name": "Jan Kowalski",
+    "email": "jan.kowalski@test.pl"
+}
+```
+
+możesz generować je automatycznie:
+
+```python
+from faker import Faker
+
+fake = Faker()
+
+user = {
+    "name": fake.name(),
+    "email": fake.email()
+}
+```
+
+Przy każdym uruchomieniu otrzymasz nowe, realistyczne dane.
+
+### Instalacja
+
+```bash
+pip install faker
+```
+
+### Podstawowe użycie
+
+```python
+from faker import Faker
+
+fake = Faker()
+
+print(fake.name())
+print(fake.email())
+print(fake.phone_number())
+```
+
+Przykładowy wynik:
+
+```text
+Anna Nowak
+anna.nowak@example.org
++48 601 123 456
+```
+
+### Najczęściej używane generatory
+
+#### Osoby
+
+```python
+fake.first_name()
+fake.last_name()
+fake.name()
+```
+
+Przykład:
+
+```text
+Jan
+Kowalski
+Jan Kowalski
+```
+
+#### E-mail
+
+```python
+fake.email()
+fake.company_email()
+```
+
+Przykład:
+
+```text
+jan.nowak@example.com
+```
+
+#### Adres
+
+```python
+fake.street_address()
+fake.city()
+fake.postcode()
+fake.address()
+```
+
+Przykład:
+
+```text
+ul. Lipowa 15
+Gdańsk
+80-001
+```
+
+#### Firma
+
+```python
+fake.company()
+fake.job()
+```
+
+Przykład:
+
+```text
+ABC Solutions Sp. z o.o.
+QA Engineer
+```
+
+#### Internet
+
+```python
+fake.user_name()
+fake.password()
+fake.url()
+fake.domain_name()
+```
+
+#### Daty
+
+```python
+fake.date()
+fake.date_of_birth()
+fake.future_date()
+fake.past_date()
+```
+
+#### Liczby
+
+```python
+fake.random_int()
+fake.pyfloat()
+```
+
+### Lokalizacja (locale)
+
+Faker obsługuje wiele języków i krajów.
+
+Polskie dane:
+
+```python
+from faker import Faker
+
+fake = Faker("pl_PL")
+```
+
+Przykład:
+
+```python
+print(fake.name())
+print(fake.address())
+```
+
+Wynik:
+
+```text
+Michał Wiśniewski
+
+ul. Długa 5
+80-200 Gdańsk
+```
+
+Inne locale:
+
+```python
+Faker("en_US")
+Faker("de_DE")
+Faker("fr_FR")
+```
+
+### Powtarzalne dane (seed)
+
+Jeżeli chcesz generować zawsze te same dane:
+
+```python
+from faker import Faker
+
+Faker.seed(123)
+
+fake = Faker()
+
+print(fake.name())
+```
+
+Przy każdym uruchomieniu wynik będzie identyczny.
+
+Przydatne w testach regresyjnych.
+
+### Generowanie wielu rekordów
+
+```python
+for _ in range(5):
+    print(
+        fake.name(),
+        fake.email()
+    )
+```
+
+Przykład:
+
+```text
+Jan Kowalski jan@test.pl
+Anna Nowak anna@test.pl
+Piotr Zieliński piotr@test.pl
+...
+```
+
+### Integracja z pytest
+
+Bardzo częsty scenariusz:
+
+```python
+from faker import Faker
+
+fake = Faker()
+
+def test_create_user():
+
+    payload = {
+        "name": fake.name(),
+        "email": fake.email()
+    }
+
+    response = client.post(
+        "/users",
+        json=payload
+    )
+
+    assert response.status_code == 201
+```
+
+Dzięki temu każdy test używa nowych danych.
+
+### Fixtures w pytest
+
+```python
+import pytest
+from faker import Faker
+
+@pytest.fixture
+def fake():
+    return Faker()
+```
+
+Użycie:
+
+```python
+def test_user(fake):
+
+    email = fake.email()
+
+    assert "@" in email
+```
+
+### Typowe zastosowania w QA
+
+#### 1. Tworzenie użytkowników testowych
+
+```python
+payload = {
+    "name": fake.name(),
+    "email": fake.email()
+}
+```
+
+#### 2. Testowanie walidacji formularzy
+
+```python
+fake.email()
+fake.phone_number()
+fake.postcode()
+```
+
+#### 3. Przygotowanie danych do API
+
+```python
+response = requests.post(
+    "/users",
+    json={
+        "name": fake.name(),
+        "email": fake.email()
+    }
+)
+```
+
+#### 4. Seedowanie bazy danych
+
+```python
+for _ in range(1000):
+    create_user(
+        name=fake.name(),
+        email=fake.email()
+    )
+```
+
+#### 5. Testy obciążeniowe
+
+Generowanie dużej liczby unikalnych rekordów:
+
+```python
+fake.uuid4()
+fake.email()
+fake.user_name()
+```
+
+### Zalety
+
+* bardzo szybkie generowanie danych,
+* setki gotowych typów danych,
+* obsługa wielu krajów i języków,
+* łatwa integracja z pytest,
+* możliwość generowania realistycznych danych,
+* możliwość uzyskania powtarzalnych wyników przez seed.
+
+### Ograniczenia
+
+* dane są realistyczne, ale fikcyjne,
+* wygenerowane wartości nie zawsze spełniają wymagania konkretnego systemu,
+* czasami trzeba tworzyć własne generatory dla niestandardowych formatów danych.
+
+### Typowy stack QA w Pythonie
+
+Często spotykany zestaw bibliotek:
+
+* pytest – wykonywanie testów,
+* Requests – komunikacja z API,
+* Pydantic – walidacja odpowiedzi,
+* Faker – generowanie danych testowych.
+
+### Krótka definicja do notatek
+
+**Faker** – biblioteka Pythona służąca do generowania losowych, realistycznych danych testowych, takich jak imiona,
+nazwiska, adresy, e-maile, numery telefonów, daty czy dane firmowe. Jest powszechnie wykorzystywana w automatyzacji
+testów, przygotowywaniu danych testowych oraz seedowaniu baz danych.
+
+## 📕assertpy
+
+**assertpy** to biblioteka Pythona dostarczająca **bardziej czytelne i ekspresyjne asercje** niż standardowy `assert`.
+Pozwala pisać testy w stylu tzw. *fluent assertions* (łańcuchowych asercji), dzięki czemu kod testów jest często
+łatwiejszy do czytania i bliższy językowi naturalnemu.
+
+### Czym jest assertpy?
+
+Standardowa asercja w Pythonie:
+
+```python
+assert user["name"] == "Jan"
+```
+
+W assertpy:
+
+```python
+from assertpy import assert_that
+
+assert_that(user["name"]).is_equal_to("Jan")
+```
+
+Oba zapisy robią to samo, ale drugi jest bardziej opisowy.
+
+### Instalacja
+
+```bash
+pip install assertpy
+```
+
+### Podstawowe użycie
+
+Import:
+
+```python
+from assertpy import assert_that
+```
+
+Przykład:
+
+```python
+assert_that(5).is_equal_to(5)
+```
+
+### Najczęściej używane asercje
+
+#### Porównanie wartości
+
+```python
+assert_that(10).is_equal_to(10)
+```
+
+```python
+assert_that(10).is_not_equal_to(5)
+```
+
+#### Wartości logiczne
+
+```python
+assert_that(True).is_true()
+```
+
+```python
+assert_that(False).is_false()
+```
+
+#### None
+
+```python
+assert_that(user).is_not_none()
+```
+
+```python
+assert_that(value).is_none()
+```
+
+#### Stringi
+
+```python
+assert_that("Jan Kowalski").contains("Jan")
+```
+
+```python
+assert_that("Jan Kowalski").starts_with("Jan")
+```
+
+```python
+assert_that("Jan Kowalski").ends_with("Kowalski")
+```
+
+```python
+assert_that("Jan").is_length(3)
+```
+
+#### Listy i kolekcje
+
+```python
+assert_that(users).contains("Jan")
+```
+
+```python
+assert_that(users).does_not_contain("Adam")
+```
+
+```python
+assert_that(users).is_not_empty()
+```
+
+```python
+assert_that(users).is_length(3)
+```
+
+#### Słowniki
+
+```python
+assert_that(response).contains_key("id")
+```
+
+```python
+assert_that(response).contains_value("Jan")
+```
+
+```python
+assert_that(response).contains_entry({
+    "id": 1
+})
+```
+
+### Łańcuchowanie asercji
+
+Jedna z największych zalet.
+
+```python
+assert_that(email) \
+    .is_not_empty() \
+    .contains("@") \
+    .ends_with(".com")
+```
+
+Dzięki temu można opisać wiele oczekiwań wobec jednej wartości.
+
+### Obsługa wyjątków
+
+Sprawdzanie wyjątków:
+
+```python
+from assertpy import assert_that
+
+assert_that(
+    lambda: int("abc")
+).raises(ValueError)
+```
+
+### Przykłady w testach API
+
+Odpowiedź:
+
+```python
+data = response.json()
+```
+
+Standardowo:
+
+```python
+assert data["id"] == 1
+assert data["name"] == "Jan"
+assert "email" in data
+```
+
+W assertpy:
+
+```python
+assert_that(data["id"]).is_equal_to(1)
+
+assert_that(data["name"]).is_equal_to("Jan")
+
+assert_that(data).contains_key("email")
+```
+
+### Integracja z pytest
+
+Bardzo często używany razem z pytest.
+
+```python
+from assertpy import assert_that
+
+def test_sum():
+    result = 2 + 3
+
+    assert_that(result).is_equal_to(5)
+```
+
+Pytest uruchamia test, a assertpy odpowiada za bardziej czytelne asercje.
+
+### Przykład z requests i pydantic
+
+```python
+from assertpy import assert_that
+
+user = User.model_validate(
+    response.json()
+)
+
+assert_that(user.id).is_positive()
+
+assert_that(user.name).is_not_empty()
+```
+
+W połączeniu z:
+
+* Requests,
+* Pydantic,
+* pytest
+
+tworzy bardzo czytelne testy API.
+
+### Zalety
+
+#### Czytelność
+
+```python
+assert_that(price).is_greater_than(0)
+```
+
+jest często bardziej zrozumiałe niż:
+
+```python
+assert price > 0
+```
+
+#### Bogaty zestaw metod
+
+Dla:
+
+* stringów,
+* list,
+* słowników,
+* liczb,
+* wyjątków,
+* dat.
+
+#### Fluent API
+
+Możliwość łańcuchowania:
+
+```python
+assert_that(name) \
+    .is_not_empty() \
+    .starts_with("J")
+```
+
+#### Lepsza komunikacja intencji testu
+
+Kod przypomina opis wymagań biznesowych.
+
+### Ograniczenia
+
+* dodaje dodatkową zależność do projektu,
+* większość prostych testów można napisać zwykłym `assert`,
+* nie jest tak powszechnie używany jak natywne asercje pytest.
+
+W wielu zespołach spotkasz wyłącznie:
+
+```python
+assert response.status_code == 200
+```
+
+ponieważ pytest już sam generuje bardzo dobre komunikaty o błędach.
+
+### assertpy vs standardowy assert
+
+#### Standardowy pytest
+
+```python
+assert user.age > 18
+```
+
+#### assertpy
+
+```python
+assert_that(user.age).is_greater_than(18)
+```
+
+#### Standardowy pytest
+
+```python
+assert "email" in response
+```
+
+#### assertpy
+
+```python
+assert_that(response).contains_key("email")
+```
+
+Assertpy stawia przede wszystkim na **czytelność i opisowość**, a nie na dodawanie nowych możliwości testowych.
+
+### Typowy stack QA
+
+Często można spotkać zestaw:
+
+* pytest – uruchamianie testów,
+* Requests – komunikacja z API,
+* Pydantic – walidacja danych,
+* Faker – generowanie danych testowych,
+* assertpy – czytelne asercje.
+
+### Krótka definicja do notatek
+
+**assertpy** – biblioteka Pythona dostarczająca fluent assertions (łańcuchowe asercje), umożliwiająca tworzenie
+bardziej czytelnych i opisowych testów niż standardowy `assert`. Oferuje bogaty zestaw metod do weryfikacji liczb,
+tekstów, kolekcji, słowników i wyjątków oraz dobrze integruje się z pytest.
