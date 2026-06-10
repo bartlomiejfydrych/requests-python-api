@@ -5,6 +5,7 @@
 - [START – rozpoczęcie pisania testów](#start--rozpoczęcie-pisania-testów)
   - [Dostępy](#dostępy)
   - [config.ini](#configini)
+  - [.env](#env)
 
 ---
 
@@ -63,3 +64,7 @@ Zapisujemy w nim takie rzeczy jak:
    baseUrlTLD=com
    baseUrlNumber=1
    ```
+
+## .env
+
+1. Upewniamy się, że mamy dodane **dependency** o nazwie `python-dotenv`

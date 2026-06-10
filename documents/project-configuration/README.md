@@ -20,6 +20,7 @@
    - [pydantic](#pydantic)
    - [Faker](#faker)
    - [assertpy](#assertpy)
+   - [python-dotenv](#python-dotenv)
 
 ---
 
@@ -92,9 +93,10 @@
    - **pydantic** – Mapowanie response'a na DTO (`pip install pydantic`)
    - **Faker** – Generator danych testowych (`pip install Faker`)
    - **assertpy** – Czytelniejsze asercje (`pip install assertpy`)
+   - **python-dotenv** – Odczytywanie danych z pliku `.env` (`pip install python-dotenv`)
    - Można też zainstalować wszystko naraz jednym poleceniem:
      ```bash
-     pip install pytest requests pydantic Faker assertpy
+     pip install pytest requests pydantic Faker assertpy python-dotenv
      ```
 6. Po instalacji generujemy plik z zaleznościami (To taki odpowiednik `pom.xml` z Javy):
    ```bash
@@ -1450,15 +1452,6 @@ fake.user_name()
 * wygenerowane wartości nie zawsze spełniają wymagania konkretnego systemu,
 * czasami trzeba tworzyć własne generatory dla niestandardowych formatów danych.
 
-### Typowy stack QA w Pythonie
-
-Często spotykany zestaw bibliotek:
-
-* pytest – wykonywanie testów,
-* Requests – komunikacja z API,
-* Pydantic – walidacja odpowiedzi,
-* Faker – generowanie danych testowych.
-
 ### Krótka definicja do notatek
 
 **Faker** – biblioteka Pythona służąca do generowania losowych, realistycznych danych testowych, takich jak imiona,
@@ -1762,18 +1755,343 @@ assert_that(response).contains_key("email")
 
 Assertpy stawia przede wszystkim na **czytelność i opisowość**, a nie na dodawanie nowych możliwości testowych.
 
-### Typowy stack QA
-
-Często można spotkać zestaw:
-
-* pytest – uruchamianie testów,
-* Requests – komunikacja z API,
-* Pydantic – walidacja danych,
-* Faker – generowanie danych testowych,
-* assertpy – czytelne asercje.
-
 ### Krótka definicja do notatek
 
 **assertpy** – biblioteka Pythona dostarczająca fluent assertions (łańcuchowe asercje), umożliwiająca tworzenie
 bardziej czytelnych i opisowych testów niż standardowy `assert`. Oferuje bogaty zestaw metod do weryfikacji liczb,
 tekstów, kolekcji, słowników i wyjątków oraz dobrze integruje się z pytest.
+
+## 📕python-dotenv
+
+**python-dotenv** to biblioteka Pythona służąca do **wczytywania zmiennych środowiskowych z pliku `.env`** do aplikacji.
+Dzięki temu można przechowywać konfigurację (np. adresy API, tokeny, hasła, dane dostępowe) poza kodem źródłowym.
+
+### Czym jest python-dotenv?
+
+Zamiast wpisywać dane konfiguracyjne bezpośrednio w kodzie:
+
+```python
+API_URL = "https://api.test.com"
+API_TOKEN = "secret-token"
+```
+
+możesz umieścić je w pliku `.env`:
+
+```text
+API_URL=https://api.test.com
+API_TOKEN=secret-token
+```
+
+a następnie wczytać do aplikacji:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api_url = os.getenv("API_URL")
+api_token = os.getenv("API_TOKEN")
+```
+
+### Dlaczego jest używany?
+
+Pozwala oddzielić:
+
+* kod aplikacji,
+* konfigurację środowiska.
+
+Dzięki temu ten sam kod może działać na różnych środowiskach:
+
+* DEV,
+* TEST,
+* QA,
+* STAGE,
+* PROD.
+
+Wystarczy zmienić zawartość pliku `.env`.
+
+### Instalacja
+
+```bash
+pip install python-dotenv
+```
+
+### Podstawowe użycie
+
+#### Plik `.env`
+
+```text
+BASE_URL=https://api.test.com
+USERNAME=test_user
+PASSWORD=test_password
+```
+
+#### Kod
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+base_url = os.getenv("BASE_URL")
+username = os.getenv("USERNAME")
+password = os.getenv("PASSWORD")
+```
+
+### Funkcja `load_dotenv()`
+
+Najczęściej spotykana:
+
+```python
+load_dotenv()
+```
+
+Domyślnie szuka pliku `.env` w bieżącym katalogu projektu.
+
+### Odczyt zmiennych
+
+```python
+import os
+
+os.getenv("BASE_URL")
+```
+
+lub:
+
+```python
+os.environ["BASE_URL"]
+```
+
+Różnica:
+
+```python
+os.getenv("BASE_URL")
+```
+
+zwraca `None`, gdy zmienna nie istnieje.
+
+Natomiast:
+
+```python
+os.environ["BASE_URL"]
+```
+
+wyrzuci:
+
+```python
+KeyError
+```
+
+### Wartości domyślne
+
+```python
+timeout = os.getenv(
+    "TIMEOUT",
+    "30"
+)
+```
+
+Jeżeli zmienna nie istnieje:
+
+```python
+timeout == "30"
+```
+
+### Własny plik .env
+
+Można wskazać konkretną lokalizację:
+
+```python
+from dotenv import load_dotenv
+
+load_dotenv(".env.qa")
+```
+
+Przykład:
+
+```text
+.env.dev
+.env.qa
+.env.prod
+```
+
+### Typowy przykład w automatyzacji testów
+
+Plik:
+
+```text
+BASE_URL=https://api.qa.company.com
+TOKEN=abc123
+```
+
+Kod:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+BASE_URL = os.getenv("BASE_URL")
+TOKEN = os.getenv("TOKEN")
+```
+
+Test:
+
+```python
+response = requests.get(
+    f"{BASE_URL}/users",
+    headers={
+        "Authorization": f"Bearer {TOKEN}"
+    }
+)
+```
+
+Dzięki temu nie trzeba zmieniać kodu przy przełączaniu środowisk.
+
+### Integracja z pytest
+
+Bardzo często spotykany wzorzec:
+
+```python
+# conftest.py
+
+from dotenv import load_dotenv
+
+load_dotenv()
+```
+
+Po uruchomieniu testów wszystkie zmienne są dostępne globalnie:
+
+```python
+import os
+
+base_url = os.getenv("BASE_URL")
+```
+
+### Przykład z Pydantic
+
+Często używany razem z Pydantic.
+
+```python
+from pydantic import BaseModel
+import os
+
+class Config(BaseModel):
+    base_url: str
+    token: str
+
+config = Config(
+    base_url=os.getenv("BASE_URL"),
+    token=os.getenv("TOKEN")
+)
+```
+
+Pydantic dodatkowo zweryfikuje poprawność konfiguracji.
+
+### Typowe zastosowania w QA
+
+#### 1. Adresy środowisk
+
+```text
+BASE_URL=https://qa.company.com
+```
+
+#### 2. Dane logowania
+
+```text
+USERNAME=test_user
+PASSWORD=secret
+```
+
+#### 3. Tokeny API
+
+```text
+API_TOKEN=123456
+```
+
+#### 4. Parametry testów
+
+```text
+TIMEOUT=30
+RETRY_COUNT=3
+```
+
+#### 5. Konfiguracja baz danych
+
+```text
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=test
+DB_PASSWORD=password
+```
+
+### Dobre praktyki
+
+#### Dodaj `.env` do `.gitignore`
+
+Plik może zawierać:
+
+* hasła,
+* tokeny,
+* klucze API.
+
+Przykład:
+
+```text
+.env
+.env.*
+```
+
+#### Udostępniaj `.env.example`
+
+Przykład:
+
+```text
+BASE_URL=
+USERNAME=
+PASSWORD=
+TOKEN=
+```
+
+Nowi członkowie zespołu wiedzą wtedy, jakie zmienne są wymagane.
+
+#### Nie przechowuj sekretów w kodzie
+
+Zamiast:
+
+```python
+TOKEN = "abc123"
+```
+
+lepiej:
+
+```python
+TOKEN = os.getenv("TOKEN")
+```
+
+### Zalety
+
+* bardzo prosta konfiguracja,
+* oddzielenie konfiguracji od kodu,
+* łatwe przełączanie środowisk,
+* bezpieczniejsze zarządzanie sekretami,
+* świetna integracja z pytest i frameworkami webowymi.
+
+### Ograniczenia
+
+* samodzielnie nie szyfruje danych,
+* plik `.env` nadal jest zwykłym plikiem tekstowym,
+* w dużych organizacjach często zastępowany przez rozwiązania typu:
+
+  * HashiCorp Vault,
+  * AWS Secrets Manager,
+  * Azure Key Vault.
+
+### Krótka definicja do notatek
+
+**python-dotenv** – biblioteka Pythona umożliwiająca wczytywanie zmiennych środowiskowych z pliku `.env`. Jest
+wykorzystywana do przechowywania konfiguracji aplikacji i testów (adresów API, danych logowania, tokenów, parametrów
+środowiskowych) poza kodem źródłowym, co ułatwia zarządzanie konfiguracją i zwiększa bezpieczeństwo.
