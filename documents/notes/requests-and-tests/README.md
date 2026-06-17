@@ -6,6 +6,7 @@
   - [Dostępy](#dostępy)
   - [config.ini](#configini)
   - [.env](#env)
+  - [config.py](#configpy)
 
 ---
 
@@ -68,3 +69,18 @@ Zapisujemy w nim takie rzeczy jak:
 ## .env
 
 1. Upewniamy się, że mamy dodane **dependency** o nazwie `python-dotenv`
+2. W **katalogu głównym** projektu tworzymy zwykły katalog o nazwie `environment`
+3. W katalogu `environment` tworzymy plik (File) o nazwie `.env.example` i definiujemy tam szablon naszych zmiennych
+4. W tym samym katalogu tworzymy plik (File) o nazwie `.env`
+5. W pliku `.env` do zdefiniowanego szablonu z naszymi zmiennymi dodajemy ich realne wartości
+
+## config.py
+
+1. W package `src` tworzymy **package** o nazwie `configuration`
+2. W tym package tworzymy plik Python (Python File) o nazwie `config.py`
+3. (Opcjonalne) W package `src` tworzymy package o nazwie `enums`
+4. (Opcjonalne) W package `enums` tworzymy package o nazwie `configuration`
+5. (Opcjonalne) W package `configuration` tworzymy plik Python (Python File) o nazwie `logs_mode.py`
+6. (Opcjonalne) W tym pliku dodajemy enumy z nazwami typów naszych przyszłych loggerów oraz walidator dla poprawności ich wartości
+7. W pliku `config.py` wczytujemy oba pliki konfiguracyjne i dodajemy metody pobierające dane ich zmiennych
+8. W pliku `config.ini` dodajemy sekcje dla naszych zmiennych lub jedną ogólną np. `[config]` dla wszystkich zmiennych
