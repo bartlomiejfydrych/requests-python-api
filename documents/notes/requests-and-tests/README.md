@@ -7,6 +7,7 @@
   - [config.ini](#configini)
   - [.env](#env)
   - [config.py](#configpy)
+  - [](#)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -106,6 +107,11 @@ Twój kod jest poprawny i gotowy do użycia z aktualnym `config.ini`.
 6. (Opcjonalne) W tym pliku dodajemy enumy z nazwami typów naszych przyszłych loggerów oraz walidator dla poprawności ich wartości
 7. W pliku `config.py` wczytujemy oba pliki konfiguracyjne i dodajemy metody pobierające dane ich zmiennych
 8. W pliku `config.ini` dodajemy sekcje dla naszych zmiennych lub jedną ogólną np. `[config]` dla wszystkich zmiennych
+
+## base_url_builder.py (opcjonalne)
+
+1. W package `src/configuration` tworzymy plik `base_url_builder.py`
+2. W pliku `base_url_builder.py` piszemy budowanie naszego URL ze zmiennych konfiguracyjnych projektu
 
 ---
 
