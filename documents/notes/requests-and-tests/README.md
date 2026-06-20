@@ -7,7 +7,8 @@
   - [config.ini](#configini)
   - [.env](#env)
   - [config.py](#configpy)
-  - [](#)
+  - [base_url_builder.py (opcjonalne)](#base_url_builderpy-opcjonalne)
+  - [Requests Session](#requests-session)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -112,6 +113,59 @@ Twój kod jest poprawny i gotowy do użycia z aktualnym `config.ini`.
 
 1. W package `src/configuration` tworzymy plik `base_url_builder.py`
 2. W pliku `base_url_builder.py` piszemy budowanie naszego URL ze zmiennych konfiguracyjnych projektu
+
+## Requests Session
+
+1. W package `src/configuration` tworzymy package o nazwie `requests_session`
+2. W package `requests_session` tworzymy plik `base_request_spec.py`
+3. Jak to działa:  
+   Sercem rozwiązania jest `BaseRequestSpec` — klasa dziedzicząca po `requests.Session`. `requests.Session` ma wbudowaną
+   funkcję, której Java/REST Assured nie ma za darmo: jej `params` i `headers` **automatycznie scalają się** z parametrami
+   podanymi przy konkretnym wywołaniu (`session.get(url, params={"extra": "123"})`). Dorzuciłem tylko nadpisanie
+   `request()`, żeby sama doklejała `base_url` — bo to jedyna rzecz, której natywnie `requests` nie robi.
+4. W package `requests_session` tworzymy plik `config_request_spec.py`
+5. W nim definiujemy pobierające specyfikację requestów, czyli:
+   - Request, który ma mieć zawsze klucz i token
+   - Request bez klucza api
+   - Request bez tokenu
+
+Przykład zastosowania tego później w teście:
+```python
+"""
+Przykładowy test pokazujący, jak korzystać z ConfigRequestSpec.
+Wymaga zmiennych środowiskowych: TRELLO_API_KEY, TRELLO_TOKEN
+(opcjonalnie: TRELLO_BASE_URL).
+"""
+from configuration.requests_session.config_request_spec import get_request_specification
+
+
+def test_get_boards():
+    session = ConfigRequestSpec.get_request_specification()
+
+    # "key" i "token" zostaną automatycznie dodane jako query params
+    response = session.get("/1/members/me/boards")
+
+    assert response.status_code == 200
+
+
+def test_create_board():
+    session = ConfigRequestSpec.get_request_specification()
+
+    response = session.post(
+        "/1/boards",
+        params={"name": "Mój testowy board"},  # dodatkowy param tylko dla tego requestu
+    )
+
+    assert response.status_code == 200
+
+
+def test_request_without_token_returns_401():
+    session = ConfigRequestSpec.get_request_specification_without_token()
+
+    response = session.get("/1/members/me/boards")
+
+    assert response.status_code == 401
+```
 
 ---
 
