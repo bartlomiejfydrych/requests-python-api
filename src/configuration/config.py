@@ -6,6 +6,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from enums.configuration.logs_mode import LogsMode
+from exceptions.illegal_state_error import IllegalStateError
 
 # ==========================================================================================================
 # PATHS
@@ -27,13 +28,6 @@ _loaded = False
 # NOTE FOR ME: Wczytanie .env od razu (brak pliku nie powoduje błędu tak jak {ignoreIfMissing} w Javie)
 load_dotenv(dotenv_path=_ENV_PATH)
 
-
-# ==========================================================================================================
-# CUSTOM EXCEPTION (odpowiednik IllegalStateException z Javy)
-# ==========================================================================================================
-
-class IllegalStateError(Exception):
-    pass
 
 # ==========================================================================================================
 # LOAD CONFIGURATION FILE (config.ini)
