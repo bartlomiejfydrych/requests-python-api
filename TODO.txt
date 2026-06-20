@@ -1,7 +1,4 @@
 LISTA RZECZY DO ZROBIENIA:
 
-– Poprawić plik {config.py}
-– Ogarnąć i zastosować sekcje z pliku {config.ini}
-– Wydzielić customowy wyjątek do osobnego miejsca i opcjonalnie to opisać
 –
 –
