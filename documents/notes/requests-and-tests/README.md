@@ -72,6 +72,22 @@ Zapisujemy w nim takie rzeczy jak:
    configparser w Pythonie został zaprojektowany pod format .ini, który zawsze wymaga przynajmniej jednej sekcji
    w nagłówkach [nazwa_sekcji]. To nie jest opcja — to wymóg formatu.
 
+### ⚠️ Ważna rzecz do sprawdzenia w Twoim `config.ini`
+
+Zwróć uwagę, że nazwy kluczy mają wielkość liter taką, jak w plikach Javy (`baseUrl`, `allureReport`) — to się zgadza
+z Twoim `.ini`. Dobrze.
+
+Natomiast `configparser` **domyślnie zamienia nazwy kluczy na małe litery** przy odczycie (nie nazwy sekcji — te są
+case-sensitive, ale klucze owszem). To może być problem:To potwierdza ważną pułapkę: **`configparser` zamienia nazwy
+kluczy na małe litery**, ale `has_option()` też automatycznie obniża wielkość liter przy sprawdzaniu — więc
+`has_option("base_url", "baseUrl")` zwraca `True`, mimo że realnie w słowniku jest `baseurl`. Dzięki temu Twój kod
+**zadziała poprawnie** — nie musisz nic zmieniać, ale warto, żebyś wiedział, że to się dzieje "pod maską", bo:
+
+- Jeśli kiedykolwiek zechcesz iterować po wszystkich kluczach sekcji (`config["base_url"].keys()`), zobaczysz same małelitery, nie `baseUrl`
+- W Javie `Properties` rozróżniał wielkość liter dokładnie tak, jak zapisano — to jedna z różnic, o której dobrze wiedzieć przy debugowaniu
+
+Twój kod jest poprawny i gotowy do użycia z aktualnym `config.ini`.
+
 ## .env
 
 1. Upewniamy się, że mamy dodane **dependency** o nazwie `python-dotenv`

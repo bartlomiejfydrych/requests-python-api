@@ -1,5 +1,6 @@
 import configparser
 import os
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -11,10 +12,10 @@ from enums.configuration.logs_mode import LogsMode
 # ==========================================================================================================
 
 # NOTE FOR ME: Root katalogu projektu (3 poziomy wyżej niż ten plik: src/configuration/config.py -> root)
-_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
-_CONFIG_INI_PATH = os.path.join(_ROOT_DIR, "resources", "configuration", "config.ini")
-_ENV_PATH = os.path.join(_ROOT_DIR, "environment", ".env")
+_CONFIG_INI_PATH = _ROOT_DIR / "resources" / "configuration" / "config.ini"
+_ENV_PATH = _ROOT_DIR / "environment" / ".env"
 
 # ==========================================================================================================
 # VARIABLES
@@ -34,7 +35,6 @@ load_dotenv(dotenv_path=_ENV_PATH)
 class IllegalStateError(Exception):
     pass
 
-
 # ==========================================================================================================
 # LOAD CONFIGURATION FILE (config.ini)
 # ==========================================================================================================
@@ -49,7 +49,7 @@ def _load_properties() -> None:
         return
     _loaded = True
 
-    if not os.path.isfile(_CONFIG_INI_PATH):
+    if not _CONFIG_INI_PATH.is_file():
         raise IllegalStateError(f"(CONFIG) File {{config.ini}} not found at {_CONFIG_INI_PATH}.")
 
     try:
@@ -66,7 +66,7 @@ def _load_properties() -> None:
 # STRING
 # ------
 
-def _get_property(key: str, default_value: Optional[str], section: str = "config") -> str:
+def _get_property(key: str, default_value: Optional[str], section: str) -> str:
     _load_properties()
 
     # 1. {system} – Get system environment variables
@@ -92,7 +92,7 @@ def _get_property(key: str, default_value: Optional[str], section: str = "config
     # 5. {missing} – Get error if property is missing
     raise IllegalStateError(
         f"(CONFIG) Missing required configuration key: '{key}'. "
-        f"Checked {{system environment}}, {{.env}} and {{config.ini}}."
+        f"Checked {{system environment}}, {{.env}} and {{config.ini}} (section '[{section}]')."
     )
 
 
@@ -100,7 +100,7 @@ def _get_property(key: str, default_value: Optional[str], section: str = "config
 # BOOLEAN
 # -------
 
-def _get_property_bool(key: str, default_value: bool, section: str = "config") -> bool:
+def _get_property_bool(key: str, default_value: bool, section: str) -> bool:
     raw = _get_property(key, str(default_value), section).lower()
 
     if raw == "true":
@@ -115,7 +115,7 @@ def _get_property_bool(key: str, default_value: bool, section: str = "config") -
 # INTEGER
 # -------
 
-def _get_property_int(key: str, default_value: int, section: str = "config") -> int:
+def _get_property_int(key: str, default_value: int, section: str) -> int:
     raw = _get_property(key, str(default_value), section)
     try:
         return int(raw)
@@ -129,7 +129,7 @@ def _get_property_int(key: str, default_value: int, section: str = "config") -> 
 
 # W Pythonie nie ma rozróżnienia int/long – funkcja pozostawiona dla zgodności nazewniczej z Javą.
 
-def _get_property_long(key: str, default_value: int, section: str = "config") -> int:
+def _get_property_long(key: str, default_value: int, section: str) -> int:
     return _get_property_int(key, default_value, section)
 
 
@@ -137,7 +137,7 @@ def _get_property_long(key: str, default_value: int, section: str = "config") ->
 # DOUBLE
 # ------
 
-def _get_property_double(key: str, default_value: float, section: str = "config") -> float:
+def _get_property_double(key: str, default_value: float, section: str) -> float:
     raw = _get_property(key, str(default_value), section)
     try:
         return float(raw)
@@ -157,50 +157,57 @@ def _get_property_double(key: str, default_value: float, section: str = "config"
 
 # Get report inclusion {Allure}
 def get_allure_report() -> bool:
-    return _get_property_bool("allureReport", True)
+    return _get_property_bool("allureReport", True, section="allure")
 
 
 # BASE URL
 
 # Get API base {URL}
 def get_base_url() -> str:
-    return _get_property("baseUrl", "https://api.trello.com/1")
+    return _get_property("baseUrl", "https://api.trello.com/1", section="base_url")
 
 
 # Get API base URL {Protocol}
 def get_base_url_protocol() -> str:
-    return _get_property("baseUrlProtocol", "https")
+    return _get_property("baseUrlProtocol", "https", section="base_url")
 
 
 # Get API base URL {Subdomain}
 def get_base_url_subdomain() -> str:
-    return _get_property("baseUrlSubdomain", "api")
+    return _get_property("baseUrlSubdomain", "api", section="base_url")
 
 
 # Get API base URL {Domain}
 def get_base_url_domain() -> str:
-    return _get_property("baseUrlDomain", "trello")
+    return _get_property("baseUrlDomain", "trello", section="base_url")
 
 
 # Get API base URL {TLD}
 def get_base_url_tld() -> str:
-    return _get_property("baseUrlTLD", "com")
+    return _get_property("baseUrlTLD", "com", section="base_url")
 
 
 # Get API base URL {Number}
 def get_base_url_number() -> str:
-    return _get_property("baseUrlNumber", "1")
+    return _get_property("baseUrlNumber", "1", section="base_url")
 
 
 # ----
 # .env
 # ----
 
+"""
+NOTE FOR ME:
+Zmienne z {.env} nie mają sekcji w {config.ini}, ale {_get_property} zawsze wymaga parametru {section}
+(sprawdzany jest tylko krok 3 – {config.ini}, więc dla kluczy z {.env} wartość {section} nie ma znaczenia,
+o ile nie istnieje w pliku {.ini} pod tą samą nazwą).
+"""
+
 # LOGS MANAGEMENT
 
 # [LOGS MODE] Get Logs Mode
 def get_logs_mode() -> LogsMode:
-    value = _get_property("LOGS_MODE", "OFF")
+    value = _get_property("LOGS_MODE", "OFF", section="env")
     return LogsMode.from_value(value)
 
 
@@ -215,28 +222,28 @@ def validate_logs_config() -> None:
 
 # [CUSTOM] Get Logs {OPTIONAL}
 def get_logs_custom_optional() -> bool:
-    return _get_property_bool("LOGS_CUSTOM_OPTIONAL", False)
+    return _get_property_bool("LOGS_CUSTOM_OPTIONAL", False, section="env")
 
 
 # [CUSTOM] Get Logs {COLOR}
 def get_logs_custom_color() -> bool:
-    return _get_property_bool("LOGS_CUSTOM_COLOR", False)
+    return _get_property_bool("LOGS_CUSTOM_COLOR", False, section="env")
 
 
 # TRELLO API KEY & TOKEN
 
 # Get Trello {API key}
 def get_trello_api_key() -> str:
-    return _get_property("TRELLO_API_KEY", None)
+    return _get_property("TRELLO_API_KEY", None, section="env")
 
 
 # Get Trello {token}
 def get_trello_token() -> str:
-    return _get_property("TRELLO_TOKEN", None)
+    return _get_property("TRELLO_TOKEN", None, section="env")
 
 
 # OTHER VARIABLES
 
 # Get {Trello ID}
 def get_trello_id() -> str:
-    return _get_property("TRELLO_ID", "67d9d5e34d7b900257deed0e")
+    return _get_property("TRELLO_ID", "67d9d5e34d7b900257deed0e", section="env")
