@@ -9,6 +9,7 @@
   - [config.py](#configpy)
   - [base_url_builder.py (opcjonalne)](#base_url_builderpy-opcjonalne)
   - [Requests Session](#requests-session)
+  - [Test Base](#test-base)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -166,6 +167,17 @@ def test_request_without_token_returns_401():
 
     assert response.status_code == 401
 ```
+
+## Test Base
+
+1. W package `src` tworzymy package o nazwie `tests`
+2. W package `tests` tworzymy package o nazwie `base`
+3. W package `base` tworzymy plik o nazwie `test_base.py`
+4. W pliku `test_base.py` deklarujemy:
+   - Zmienne dla sesji requestów np. by był zawsze przesyłany token i klucz
+   - Zmienne/Obiekty pomocnicze jak Faker lub Random
+   - `setup_class(cls)`, która wczytuje sesje dla testów
+   - `teardown_class(cls)`, która zamyka sesje na koniec testów
 
 ---
 
