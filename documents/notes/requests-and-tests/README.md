@@ -10,6 +10,7 @@
   - [base_url_builder.py (opcjonalne)](#base_url_builderpy-opcjonalne)
   - [Requests Session](#requests-session)
   - [Test Base](#test-base)
+  - [Pytest mark – tagi testów (opcjonalne)](#pytest-mark--tagi-testów-opcjonalne)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -178,6 +179,58 @@ def test_request_without_token_returns_401():
    - Zmienne/Obiekty pomocnicze jak Faker lub Random
    - `setup_class(cls)`, która wczytuje sesje dla testów
    - `teardown_class(cls)`, która zamyka sesje na koniec testów
+
+## Pytest mark – tagi testów (opcjonalne)
+
+1. W katalogu `src/resources/configuration` tworzymy plik o nazwie `pytest.ini`
+2. W pliku `pytest.ini` definiujemy takie markery:
+   ```ini
+   [pytest]
+   
+   markers =
+       flaky: testy niestabilne, które mogą czasem failować bez zmian w kodzie
+       positive: scenariusze pozytywne (happy path)
+       negative: scenariusze negatywne (błędne dane, brak autoryzacji, walidacje itd.)
+   
+   ; jeśli użyjesz markera, który nie jest zarejestrowany powyżej (np. literówka),
+   ; pytest zgłosi błąd przy starcie zamiast po cichu zignorować marker
+   addopts = --strict-markers
+   ```
+3. Następnie możemy je stosować w testach według poniższego przykładu:
+   ```python
+   import pytest
+   
+   from tests.base.test_base import TestBase
+   
+   
+   # Marker na poziomie klasy - oznacza WSZYSTKIE testy w tej klasie jako "positive"
+   @pytest.mark.positive
+   class TestGetBoard(TestBase):
+   
+       def test_get_board_returns_200(self):
+           response = self.request_specification_common.get("/boards/{id}")
+           assert response.status_code == 200
+   
+       # Dodatkowy marker na konkretnym teście - ten jeden test jest jednocześnie
+       # "positive" (z klasy) oraz "flaky"
+       @pytest.mark.flaky
+       def test_get_board_returns_expected_name(self):
+           response = self.request_specification_common.get("/boards/{id}")
+           assert response.json()["name"] == "Example Board"
+   
+   
+   # Marker na poziomie klasy - WSZYSTKIE testy w tej klasie są "negative"
+   @pytest.mark.negative
+   class TestGetBoardWithoutAuthorization(TestBase):
+   
+       def test_get_board_without_api_key_returns_401(self):
+           response = self.request_specification_without_api_key.get("/boards/{id}")
+           assert response.status_code == 401
+   
+       def test_get_board_without_token_returns_401(self):
+           response = self.request_specification_without_token.get("/boards/{id}")
+           assert response.status_code == 401
+   ```
 
 ---
 

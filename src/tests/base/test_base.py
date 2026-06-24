@@ -24,17 +24,6 @@ class TestBase:
     request_specification_without_api_key: requests.Session = None    # Sesja bez api key — scenariusze negatywne (np. brak autoryzacji)
     request_specification_without_token: requests.Session = None    # Sesja bez tokena — scenariusze negatywne
 
-    # -----
-    # TESTS
-    # -----
-
-    # Tagi testów (trzymane tu głównie jako referencja / do użycia programistycznego;
-    # do faktycznego tagowania testów służą dekoratory @pytest.mark.<nazwa>,
-    # zarejestrowane w pytest.ini / pyproject.toml)
-    TEST_TAG_FLAKY = "flaky"
-    TEST_TAG_POSITIVE = "positive"
-    TEST_TAG_NEGATIVE = "negative"
-
     # -------
     # HELPERS
     # -------
