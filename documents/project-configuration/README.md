@@ -21,6 +21,7 @@
    - [Faker](#faker)
    - [assertpy](#assertpy)
    - [python-dotenv](#python-dotenv)
+   - [deepdiff](#deepdiff)
 
 ---
 
@@ -94,9 +95,10 @@
    - **Faker** – Generator danych testowych (`pip install Faker`)
    - **assertpy** – Czytelniejsze asercje (`pip install assertpy`)
    - **python-dotenv** – Odczytywanie danych z pliku `.env` (`pip install python-dotenv`)
+   - **deepdiff** – Rekurencyjne porównywanie danych (`pip install deepdiff`)
    - Można też zainstalować wszystko naraz jednym poleceniem:
      ```bash
-     pip install pytest requests pydantic Faker assertpy python-dotenv
+     pip install pytest requests pydantic Faker assertpy python-dotenv deepdiff
      ```
 6. Po instalacji generujemy plik z zaleznościami (To taki odpowiednik `pom.xml` z Javy):
    ```bash
@@ -2095,3 +2097,435 @@ TOKEN = os.getenv("TOKEN")
 **python-dotenv** – biblioteka Pythona umożliwiająca wczytywanie zmiennych środowiskowych z pliku `.env`. Jest
 wykorzystywana do przechowywania konfiguracji aplikacji i testów (adresów API, danych logowania, tokenów, parametrów
 środowiskowych) poza kodem źródłowym, co ułatwia zarządzanie konfiguracją i zwiększa bezpieczeństwo.
+
+## deepdiff
+
+**DeepDiff** to biblioteka Pythona służąca do **porównywania złożonych struktur danych** i wykrywania różnic między nimi.
+Potrafi analizować słowniki (`dict`), listy, obiekty, JSON-y, zagnieżdżone struktury oraz kombinacje tych typów.
+
+### Czym jest DeepDiff?
+
+Załóżmy, że masz dwie odpowiedzi API:
+
+```python
+response_1 = {
+    "id": 1,
+    "name": "Jan",
+    "age": 30
+}
+
+response_2 = {
+    "id": 1,
+    "name": "Jan",
+    "age": 31
+}
+```
+
+Standardowo:
+
+```python
+assert response_1 == response_2
+```
+
+Otrzymasz jedynie informację, że obiekty są różne.
+
+Z DeepDiff:
+
+```python
+from deepdiff import DeepDiff
+
+diff = DeepDiff(
+    response_1,
+    response_2
+)
+
+print(diff)
+```
+
+Wynik:
+
+```python
+{
+    'values_changed': {
+        "root['age']": {
+            'old_value': 30,
+            'new_value': 31
+        }
+    }
+}
+```
+
+Od razu wiadomo:
+
+* które pole się zmieniło,
+* jaka była stara wartość,
+* jaka jest nowa wartość.
+
+### Instalacja
+
+```bash
+pip install deepdiff
+```
+
+### Podstawowe użycie
+
+```python
+from deepdiff import DeepDiff
+
+diff = DeepDiff(obj1, obj2)
+```
+
+Brak różnic:
+
+```python
+{}
+```
+
+Wykryte różnice:
+
+```python
+{
+    ...
+}
+```
+
+### Porównywanie słowników
+
+```python
+from deepdiff import DeepDiff
+
+a = {
+    "name": "Jan",
+    "age": 30
+}
+
+b = {
+    "name": "Jan",
+    "age": 31
+}
+
+DeepDiff(a, b)
+```
+
+Wynik:
+
+```python
+{
+    'values_changed': {
+        "root['age']": {
+            'old_value': 30,
+            'new_value': 31
+        }
+    }
+}
+```
+
+### Wykrywanie nowych pól
+
+```python
+a = {
+    "id": 1
+}
+
+b = {
+    "id": 1,
+    "email": "test@test.pl"
+}
+```
+
+Wynik:
+
+```python
+{
+    'dictionary_item_added': [
+        "root['email']"
+    ]
+}
+```
+
+### Wykrywanie usuniętych pól
+
+```python
+{
+    'dictionary_item_removed': [
+        "root['email']"
+    ]
+}
+```
+
+### Porównywanie list
+
+```python
+a = [1, 2, 3]
+b = [1, 2, 4]
+```
+
+```python
+DeepDiff(a, b)
+```
+
+Wynik:
+
+```python
+{
+    'values_changed': {
+        'root[2]': {
+            'old_value': 3,
+            'new_value': 4
+        }
+    }
+}
+```
+
+### Ignorowanie kolejności
+
+Częsty problem w testach API:
+
+```python
+a = [1, 2, 3]
+b = [3, 2, 1]
+```
+
+Standardowo:
+
+```python
+a != b
+```
+
+DeepDiff:
+
+```python
+DeepDiff(
+    a,
+    b,
+    ignore_order=True
+)
+```
+
+Wynik:
+
+```python
+{}
+```
+
+### Porównywanie JSON
+
+Ponieważ JSON po deserializacji jest słownikiem:
+
+```python
+import requests
+from deepdiff import DeepDiff
+
+expected = {
+    "id": 1,
+    "name": "Jan"
+}
+
+actual = response.json()
+
+diff = DeepDiff(
+    expected,
+    actual
+)
+```
+
+### Ignorowanie konkretnych pól
+
+Przydatne dla pól dynamicznych:
+
+```python
+{
+    "id": 1,
+    "created_at": "2026-01-01"
+}
+```
+
+```python
+DeepDiff(
+    expected,
+    actual,
+    exclude_paths={
+        "root['created_at']"
+    }
+)
+```
+
+Pole zostanie pominięte.
+
+### Ignorowanie wielu pól
+
+```python
+exclude_paths={
+    "root['id']",
+    "root['created_at']",
+    "root['updated_at']"
+}
+```
+
+### Porównywanie typów
+
+```python
+a = {
+    "age": 30
+}
+
+b = {
+    "age": "30"
+}
+```
+
+Wynik:
+
+```python
+{
+    'type_changes': ...
+}
+```
+
+DeepDiff wykryje różnicę typu:
+
+```text
+int != str
+```
+
+### Typowe zastosowania w QA
+
+#### 1. Walidacja odpowiedzi API
+
+```python
+diff = DeepDiff(
+    expected_response,
+    actual_response
+)
+
+assert diff == {}
+```
+
+#### 2. Testy regresyjne
+
+Porównanie odpowiedzi przed i po zmianach:
+
+```python
+old_response
+new_response
+```
+
+```python
+DeepDiff(
+    old_response,
+    new_response
+)
+```
+
+#### 3. Testy kontraktowe
+
+Weryfikacja czy struktura odpowiedzi nie uległa zmianie.
+
+#### 4. Porównywanie plików JSON
+
+```python
+with open("expected.json") as f:
+    expected = json.load(f)
+
+with open("actual.json") as f:
+    actual = json.load(f)
+
+DeepDiff(
+    expected,
+    actual
+)
+```
+
+#### 5. Porównywanie obiektów Pydantic
+
+Jeżeli używasz Pydantic:
+
+```python
+diff = DeepDiff(
+    user1.model_dump(),
+    user2.model_dump()
+)
+```
+
+### Integracja z pytest
+
+Przykład:
+
+```python
+from deepdiff import DeepDiff
+
+def test_response():
+
+    diff = DeepDiff(
+        expected,
+        actual,
+        ignore_order=True
+    )
+
+    assert diff == {}
+```
+
+Gdy test nie przejdzie, w logach od razu widać konkretne różnice.
+
+### DeepDiff vs zwykły assert
+
+#### Standardowy assert
+
+```python
+assert expected == actual
+```
+
+Błąd:
+
+```text
+AssertionError
+```
+
+Często trudno znaleźć przyczynę.
+
+#### DeepDiff
+
+```python
+diff = DeepDiff(
+    expected,
+    actual
+)
+
+assert diff == {}
+```
+
+Błąd:
+
+```python
+{
+    'values_changed': {
+        "root['user']['email']": {
+            'old_value': 'a@test.com',
+            'new_value': 'b@test.com'
+        }
+    }
+}
+```
+
+Od razu wiadomo, co się zmieniło.
+
+### Zalety
+
+* obsługuje zagnieżdżone struktury,
+* czytelnie raportuje różnice,
+* porównuje JSON-y i słowniki,
+* pozwala ignorować kolejność elementów,
+* umożliwia wykluczanie pól dynamicznych,
+* bardzo przydatny w testach API i regresji.
+
+### Ograniczenia
+
+* dla bardzo dużych struktur może być wolniejszy niż zwykłe porównanie,
+* nie zastępuje walidacji schematu (do tego lepiej użyć Pydantic lub JSON Schema),
+* przy bardzo skomplikowanych obiektach raport może być obszerny.
+
+### Krótka definicja do notatek
+
+**DeepDiff** – biblioteka Pythona służąca do porównywania złożonych struktur danych (słowników, list, JSON-ów i obiektów)
+oraz wykrywania szczegółowych różnic między nimi. Jest często wykorzystywana w testach API, regresyjnych i kontraktowych
+do analizy zmian w odpowiedziach systemu.

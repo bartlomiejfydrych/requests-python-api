@@ -1,11 +1,14 @@
 annotated-types==0.7.0
 assertpy==1.1
+cachebox==5.2.3
 certifi==2026.5.20
 charset-normalizer==3.4.7
 colorama==0.4.6
+deepdiff==9.1.0
 Faker==40.21.0
 idna==3.18
 iniconfig==2.3.0
+orderly-set==5.5.0
 packaging==26.2
 pluggy==1.6.0
 pydantic==2.13.4
