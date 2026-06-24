@@ -182,10 +182,18 @@ def test_request_without_token_returns_401():
 
 ## Pytest mark – tagi testów (opcjonalne)
 
-1. W katalogu `src/resources/configuration` tworzymy plik o nazwie `pytest.ini`
+1. W głównym katalogu projektu tworzymy plik o nazwie `pytest.ini`
 2. W pliku `pytest.ini` definiujemy takie markery:
    ```ini
    [pytest]
+   
+   ; dodaje katalog src do sys.path, żeby działały importy typu
+   ; "from configuration..." / "from tests.base.test_base import TestBase"
+   ; bez ręcznego ustawiania PYTHONPATH (wymaga pytest >= 7.0)
+   pythonpath = src
+   
+   ; pozwala odpalić po prostu "pytest" z roota, bez podawania ścieżki do testów
+   testpaths = src/tests
    
    markers =
        flaky: testy niestabilne, które mogą czasem failować bez zmian w kodzie
@@ -231,6 +239,27 @@ def test_request_without_token_returns_401():
            response = self.request_specification_without_token.get("/boards/{id}")
            assert response.status_code == 401
    ```
+
+### ⚠️Rozwiązany problem
+
+Jest jednak **jeden krytyczny problem**: lokalizacja `pytest.ini`.
+
+**Problem:** masz go w `src/resources/configuration/pytest.ini`. Pytest szuka swojego pliku konfiguracyjnego
+(`pytest.ini`, `pyproject.toml`, `tox.ini`, `setup.cfg`) idąc *od katalogów testów w górę po drzewie katalogów*,
+aż znajdzie jeden z tych plików. `src/resources/configuration/` nie jest katalogiem nadrzędnym wobec `src/tests/`,
+więc pytest **nigdy go automatycznie nie znajdzie** – musiałbyś za każdym razem odpalać
+`pytest -c src/resources/configuration/pytest.ini`, co psuje się przy CI, IDE, czy po prostu gdy ktoś zapomni o fladze.
+
+**Rozwiązanie:** `pytest.ini` musi leżeć w korzeniu projektu (obok `environment/`, `images/`, `src/`). Jako bonus, mogę
+tam dorzucić opcję `pythonpath = src` – wtedy pytest sam doda `src` do `sys.path` i nie musisz już ręcznie ustawiać
+`PYTHONPATH=src`, żeby działały Twoje "gołe" importy typu `from configuration.requests_session...` czy
+`from tests.base.test_base import TestBase`.
+
+`config.ini` (Twój plik konfiguracyjny aplikacji) może spokojnie zostać tam, gdzie jest – to zwykły plik z danymi,
+czytany przez Twój kod, więc jego lokalizacja nie ma znaczenia dla pytest.
+
+Po tej zmianie, z roota projektu wystarczy odpalić po prostu `pytest` i wszystko zadziała: znajdzie testy
+w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek w markerach.
 
 ---
 
