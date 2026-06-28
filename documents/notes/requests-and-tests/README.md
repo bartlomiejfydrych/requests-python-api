@@ -11,6 +11,7 @@
   - [Requests Session](#requests-session)
   - [Test Base](#test-base)
   - [Pytest mark – tagi testów (opcjonalne)](#pytest-mark--tagi-testów-opcjonalne)
+  - [Porównywanie obiektów – utils compare](#porównywanie-obiektów--utils-compare)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -260,6 +261,20 @@ czytany przez Twój kod, więc jego lokalizacja nie ma znaczenia dla pytest.
 
 Po tej zmianie, z roota projektu wystarczy odpalić po prostu `pytest` i wszystko zadziała: znajdzie testy
 w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek w markerach.
+
+## Porównywanie obiektów – utils compare
+
+⚠️**UWAGA!** Należy pamiętać, by mieć dodane dependency **deepdiff** (`pip install deepdiff`)
+
+1. W package `src` tworzymy package o nazwie `utils`.  
+   W nim będziemy trzymać funkcje pomocnicze dla **wszystkich** testów.
+2. W package `src/utils` tworzymy plik o nazwie `utils_compare.py`
+3. W pliku `utils_compare.py` definiujemy metody (kolejność od ogółu do szczegółu):
+   - Porównujące obiekty (twarde asercje i miękkie)
+   - Ignorujące podane pola przy porównywaniu (wszędzie i po konkretnej ścieżce)
+   - Porównujące JSON'y (twarde asercje i miękkie)
+   - Usuwające podane pola rekurencyjnie przy porównywaniu z kopii
+4. Definiujemy też klasę o nazwie `SoftAssertions`, która będzie mogła wykonywać wiele sprawdzeń przed wywaleniem testu
 
 ---
 
