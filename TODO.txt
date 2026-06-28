@@ -1,4 +1,3 @@
 LISTA RZECZY DO ZROBIENIA:
 
-– Przeanalizować i wystylizować utils_compare
-– Zrobić notatki z jego działania
+–
