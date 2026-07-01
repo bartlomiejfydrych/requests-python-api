@@ -12,6 +12,7 @@
   - [Test Base](#test-base)
   - [Pytest mark – tagi testów (opcjonalne)](#pytest-mark--tagi-testów-opcjonalne)
   - [Porównywanie obiektów – utils compare](#porównywanie-obiektów--utils-compare)
+  - [Endpoints](#endpoints)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -275,6 +276,30 @@ w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek 
    - Porównujące JSON'y (twarde asercje i miękkie)
    - Usuwające podane pola rekurencyjnie przy porównywaniu z kopii
 4. Definiujemy też klasę o nazwie `SoftAssertions`, która będzie mogła wykonywać wiele sprawdzeń przed wywaleniem testu
+
+## Endpoints
+
+1. W package `src` tworzymy package o nazwie `endpoints`
+2. W package `src/endpoints` tworzymy plik o nazwie `base_endpoint.py`.  
+   **Wyjaśnienie:**  
+   Definiujemy w nim wrappery pobierające sesje.  
+   Ukrywają przed endpointami, skąd dokładnie bierze się sesja.  
+   To wygodne, bo jeśli kiedyś zmienisz sposób budowania sesji, poprawiasz tylko base_endpoint.py, a nie każdy plik endpointu.
+3. W package `src/ednpoints` tworzymy package o nazwie `boards` (na wzór dokumentacji API Trello).  
+   **Wyjaśnienie:**  
+   W zależności od formatu dokumentacji (Swagger lub to, czego używa Trello) tworzymy strukturę katalogów i klas, która
+   będzie zgodna z nią np. jeśli w Swaggerze endpoint jest zgrupowany w jeden nieduży controller to wszystkie jego warianty
+   (POST, PATCH/PUT, GET, DELETE) tworzymy w jednym pliku np. `boards.py` od endpointa `/boards`.  
+   W sytuacji, w której controller dla tego endpointa jest duży lub tak jak w dokumentacji Trello wiele endpointów, jest
+   zgrupowane w jednej ogólnej sekcji np. `Boards`, tworzymy wtedy pod każdą metodę HTTP danego endpointa osobny plik/klasę.  
+   Przykłady: `POST_create_board_endpoint`, `PUT_update_board_endpoint`, `DELETE_delete_board_endpoint` itd.
+4. W package `boards` tworzymy plik o nazwie `boards_base_endpoint.py`.  
+   Będzie on zawierał wspólny endpoint i metody dla wszystkich plików/metod HTTP.
+5. W package `boards` tworzymy plik pod nasz pierwszy endpoint o nazwie `POST_create_board_endpoint.py`.  
+   **Wyjaśnienie:**  
+   Z reguły konwencja nazw plików w Python zaleca pisanie wszystkiego małymi literami, ale w testach API to nie powinno
+   przeszkadzać, a moim zdaniem bardziej zwiększy czytelność.
+6. W nim definiujemy metody wysyłania wybranego requesta.
 
 ---
 
