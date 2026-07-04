@@ -13,6 +13,7 @@
   - [Pytest mark – tagi testów (opcjonalne)](#pytest-mark--tagi-testów-opcjonalne)
   - [Porównywanie obiektów – utils compare](#porównywanie-obiektów--utils-compare)
   - [Endpoints](#endpoints)
+  - [Enums](#enums)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -300,6 +301,19 @@ w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek 
    Z reguły konwencja nazw plików w Python zaleca pisanie wszystkiego małymi literami, ale w testach API to nie powinno
    przeszkadzać, a moim zdaniem bardziej zwiększy czytelność.
 6. W nim definiujemy metody wysyłania wybranego requesta.
+
+## Enums
+
+1. W package `src` tworzymy package o nazwie `enums`
+2. W package `src/enums` tworzymy package o nazwie `query_parameters`
+3. W package `scr/enums/query_parameters` tworzymy plik `base_query_parameter.py`.  
+   Będzie on zastępował powtarzanie property `{key}` w każdym enumie osobno.
+4. W package `query_parameters` tworzymy package o nazwie `boards` (Jako grupa endpointów z dokumentacji API Trello)
+5. W package `boards` tworzymy kolejny package o nazwie `boards` (Jako Query Parametry dotyczące tego konkretnego endpointa)
+6. W package `boards/boards` tworzymy plik o nazwie `board_base_query_parameters.py`.  
+   Definiujemy w nim Query Parametry, które są wspólne dla więcej niż jednej metody HTTP dla endpointa `/board`
+7. Teraz w tym samym miejscu tworzymy plik o nazwie `POST_create_board_query_parameters.py`.  
+   Będzie zawierał on wszystkie enumy query parametrów dla requesta POST tworzącego tablicę.
 
 ---
 
