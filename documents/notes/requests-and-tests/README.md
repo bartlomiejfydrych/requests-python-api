@@ -14,6 +14,7 @@
   - [Porównywanie obiektów – utils compare](#porównywanie-obiektów--utils-compare)
   - [Endpoints](#endpoints)
   - [Enums](#enums)
+  - [Payloads](#payloads)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -314,6 +315,21 @@ w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek 
    Definiujemy w nim Query Parametry, które są wspólne dla więcej niż jednej metody HTTP dla endpointa `/board`
 7. Teraz w tym samym miejscu tworzymy plik o nazwie `POST_create_board_query_parameters.py`.  
    Będzie zawierał on wszystkie enumy query parametrów dla requesta POST tworzącego tablicę.
+
+## Payloads
+
+1. W package `src` tworzymy package o nazwie `payloads`.  
+   **Wyjaśnienie:**  
+   - Nie każdy endpoint będzie miał osobny plik na payload/parametry.
+   - W przypadku małej ilości parametrów dane te będą podawane jako argumenty na bieżąco w testach.
+2. W package `src/payloads` tworzymy plik o nazwie `base_payload.py`
+   - Definiujemy tam wspólną metodę, która będzie "dokładać" parametry jeśli nie są podane jako `null`
+3. W package `src/payloads` tworzymy package o nazwie `boards`
+4. W package `src/payloads/boards` tworzymy plik o nazwie `POST_create_board_payload.py`
+5. W pliku tym definiujemy:
+   - Że jest to `dataclass`
+   - Listę query parametrów
+   - Metodę pomocniczą, która zamienia payload w `dict` query parametrów
 
 ---
 
