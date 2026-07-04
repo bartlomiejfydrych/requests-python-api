@@ -15,6 +15,7 @@
   - [Endpoints](#endpoints)
   - [Enums](#enums)
   - [Payloads](#payloads)
+  - [Endpoints – pozostałe](#endpoints--pozostałe)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -330,6 +331,13 @@ w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek 
    - Że jest to `dataclass`
    - Listę query parametrów
    - Metodę pomocniczą, która zamienia payload w `dict` query parametrów
+
+## Endpoints – pozostałe
+
+1. Do package `endpoints` dodajemy plik `GET_get_board_endpint.py`.  
+   Aby sprawdzać, czy dane dodawane przez POST rzeczywiście są prawidłowe.
+2. Do package `endpoints` dodajemy plik `DEL_delete_board_endpoint.py`.  
+   Aby pod koniec testu usuwać zasób dodawany przez POST.
 
 ---
 
