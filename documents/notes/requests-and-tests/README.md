@@ -16,6 +16,7 @@
   - [Enums](#enums)
   - [Payloads](#payloads)
   - [Endpoints – pozostałe](#endpoints--pozostałe)
+  - [Test – mały](#test--mały)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -338,6 +339,63 @@ w `src/tests`, doda `src` do ścieżki importów i będzie pilnować literówek 
    Aby sprawdzać, czy dane dodawane przez POST rzeczywiście są prawidłowe.
 2. Do package `endpoints` dodajemy plik `DEL_delete_board_endpoint.py`.  
    Aby pod koniec testu usuwać zasób dodawany przez POST.
+
+## Test – mały
+
+1. Mając przygotowanego naszego pierwszego mini CRUD'a w package `src/tests` tworzymy package o nazwie `api_trello`
+2. W nim tworzymy package o nazwie sekcji/kontrolera z dokumentacji. W tym przypadku `boards`
+3. Następnie tworzymy plik `test_POST_create_board.py.py`
+4. (Opcjonalne) W pliku `test_POST_create_board.py.py` piszemy najprostszy, byle jaki test-request, aby móc skopiować
+   zwracany response (jeśli nie ma takiego w dokumentacji):
+   ```python
+   class TestPostCreateBoard(TestBase):
+   
+       # ==========================================================================================================
+       # TESTS
+       # ==========================================================================================================
+   
+       def test_should_create_board(self) -> None:
+           # POST
+           response: Response = post_create_board("Nazwa tablicy 1", None)
+           print(json.dumps(response.json(), indent=4))
+           assert response.status_code == 200
+           board_id: str = response.json()["id"]
+           # GET
+           response = get_get_board(board_id)
+           print(json.dumps(response.json(), indent=4))
+           assert response.status_code == 200
+           # DELETE
+           response = delete_delete_board(board_id)
+           print(json.dumps(response.json(), indent=4))
+           assert response.status_code == 200
+   ```
+
+IDE podkreśla nazwę tego testu na żółto z dopiskiem:
+```
+Method 'test_should_create_board' may be 'static'
+```
+
+**Robimy coś z tym?**
+
+To ostrzeżenie pojawia się, bo w tej metodzie nie korzystasz z `self` — PyCharm widzi to i sugeruje, że skoro
+nie odwołujesz się do instancji, metoda mogłaby być statyczna.
+
+**W tym przypadku warto to ostrzeżenie zignorować**, i to celowo, w przeciwieństwie np. do `put_if_not_null`, gdzie
+`@staticmethod` faktycznie było poprawną poprawką. Powody:
+
+1. **Testy pytest nie powinny być `@staticmethod`.** Nawet jeśli konkretna metoda teraz nie używa `self`, to:
+   - stracisz możliwość korzystania z atrybutów klasy z `TestBase` (np. `self.request_specification_common`,
+     `self.faker`, `self.random`) bez dodatkowego dopisywania `TestBase.faker` czy podobnie,
+   - jeśli kiedyś dodasz fixture jako parametr instancyjny albo będziesz chciał skorzystać z sesji z `TestBase`,
+     będziesz musiał to i tak odkręcić.
+
+2. **To częsty fałszywy pozytyw PyCharm dla klas testowych.** Framework (pytest) sam decyduje, jak wywołuje metody
+   testowe — zakłada zwykły "bound method" z `self`, nawet jeśli konkretny test go nie potrzebuje. Zmiana na
+   `@staticmethod` nie jest błędem technicznym, ale jest niezgodna z konwencją i utrudnia rozwój testu w przyszłości.
+
+Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszyć dla całego katalogu z testami w PyCharm:
+**Settings → Editor → Inspections → wyszukaj "may be static"** i wyłącz dla plików w `tests/`, albo dodać komentarz
+`# noinspection PyMethodMayBeStatic` nad konkretną metodą, jeśli wolisz punktowo.
 
 ---
 

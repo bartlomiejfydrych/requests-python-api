@@ -6,7 +6,7 @@ from configuration.requests_session.base_request_spec import BaseRequestSpec
 from endpoints.base_endpoint import get_specification
 from endpoints.boards.boards_base_endpoint import ENDPOINT_BOARDS
 
-from payloads.boards.post_create_board_payload import PostCreateBoardPayload
+from payloads.boards.POST_create_board_payload import PostCreateBoardPayload
 
 from enums.query_parameters.boards.boards.board_base_query_parameters import BoardBaseQueryParameters
 

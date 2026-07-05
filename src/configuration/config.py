@@ -12,11 +12,14 @@ from exceptions.illegal_state_error import IllegalStateError
 # PATHS
 # ==========================================================================================================
 
-# NOTE FOR ME: Root katalogu projektu (3 poziomy wyżej niż ten plik: src/configuration/config.py -> root)
-_ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+# NOTE FOR ME: Katalog "src" (2 poziomy wyżej niż ten plik: src/configuration/config.py -> src)
+_SRC_DIR = Path(__file__).resolve().parent.parent
 
-_CONFIG_INI_PATH = _ROOT_DIR / "resources" / "configuration" / "config.ini"
-_ENV_PATH = _ROOT_DIR / "environment" / ".env"
+# NOTE FOR ME: Root repozytorium (1 poziom wyżej niż "src")
+_PROJECT_ROOT_DIR = _SRC_DIR.parent
+
+_CONFIG_INI_PATH = _SRC_DIR / "resources" / "configuration" / "config.ini"
+_ENV_PATH = _PROJECT_ROOT_DIR / "environment" / ".env"
 
 # ==========================================================================================================
 # VARIABLES
