@@ -17,6 +17,7 @@
   - [Payloads](#payloads)
   - [Endpoints – pozostałe](#endpoints--pozostałe)
   - [Test – mały](#test--mały)
+  - [Expected responses](#expected-responses)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 
 ---
@@ -396,6 +397,14 @@ nie odwołujesz się do instancji, metoda mogłaby być statyczna.
 Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszyć dla całego katalogu z testami w PyCharm:
 **Settings → Editor → Inspections → wyszukaj "may be static"** i wyłącz dla plików w `tests/`, albo dodać komentarz
 `# noinspection PyMethodMayBeStatic` nad konkretną metodą, jeśli wolisz punktowo.
+
+## Expected responses
+
+1. W package `src` tworzymy package o nazwie `expected_responses`
+2. W package tym tworzymy package zgodny z układem w dokumentacji API, w tym przypadku `boards`
+3. W package tym tworzymy plik z nazwą zgodną z endpointem, dla którego będziemy trzymać w nim oczekiwane respons'y,
+   w tym przypadku `POST_create_board_expected.py`
+4. W pliku tym tworzymy zmienną typu `dict`, w której umieszczamy nasz oczekiwany JSON
 
 ---
 
