@@ -406,6 +406,23 @@ Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszy�
    w tym przypadku `POST_create_board_expected.py`
 4. W pliku tym tworzymy zmienną typu `dict`, w której umieszczamy nasz oczekiwany JSON
 
+## Utils – Response (DTO)
+
+1. W package `src` tworzymy package o nazwie `dto`
+2. W package `src/dto` tworzymy plik o nazwie `base_dto.py`  
+   Plik ten służy jako miejsce, w którym ustawiamy konfiguracje walidowania naszych DTO.
+3. W package `src` tworzymy package o nazwie `exceptions`  
+   Czasami warto tworzyć własne wyjątki, aby lepiej wiedzieć, co się dzieje w razie błędów.
+4. W package `src/exceptions` dodajemy dwa pliki-wyjątki:
+   - `exception_dto_deserialization.py`
+   - `exception_json_parsing.py`
+5. W package `src` tworzymy package o nazwie `utils`
+6. W package `src/utils` tworzymy package o nazwie `response`
+7. W package `src/utils/response` tworzymy plik o nazwie `utils_response_json_parser.py`  
+   Ma on służyć do czystego parsowania bez wiązania z konkretnym DTO
+8. W tym samym package tworzymy plik o nazwie `utils_response_deserializer.py`  
+   W tym pliku są metody walidujące i przerabiające response na DTO zarówno dla obiektu, jak i dla listy obiektów.
+
 ---
 
 # 📄config.ini – Wymagalność podziału na sekcje
