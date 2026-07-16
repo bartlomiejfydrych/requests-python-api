@@ -18,7 +18,9 @@
   - [Endpoints – pozostałe](#endpoints--pozostałe)
   - [Test – mały](#test--mały)
   - [Expected responses](#expected-responses)
+  - [DTO](#dto)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
+- [DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)](#dto--pydantic--aliasy-pól-camelcase-json--snake_case-python)
 
 ---
 
@@ -423,6 +425,21 @@ Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszy�
 8. W tym samym package tworzymy plik o nazwie `utils_response_deserializer.py`  
    W tym pliku są metody walidujące i przerabiające response na DTO zarówno dla obiektu, jak i dla listy obiektów.
 
+## DTO
+
+1. W package `src/dto` tworzymy katalog zgodny z nazwą grupy endpointów w dokumentacji np. `boards`
+2. W package `src/dto/boards` jeśli zwracane odpowiedzi z naszego CRUD'a różnią się ilością parametrów, ale mają
+   większość elementów wspólnych, to tworzymy plik, który będzie najpierw przechowywał te elementy wspólne np. `board_base_dto.py`
+3. Wklejamy do dowolnego **agenta AI** nasz wcześniej skopiowany response oraz dopisujemy, jakie są warunki dla pól,
+   jeśli takie znamy i prosimy go o przerobienie tego na DTO.  
+   **Podajemy:**
+   - informację, że chcemy to na DTO
+   - response
+   - warunki dla pól
+   - wszystkie pola mają być wymagane
+   - ma być wykrywany brak jakiegoś pola
+   - ma być wykrywane, jeśli pojawią się jakieś nadmiarowe pola
+
 ---
 
 # 📄config.ini – Wymagalność podziału na sekcje
@@ -517,3 +534,85 @@ baseUrlNumber = 1
 
 Gdybyś chciał zachować płaski styl bardziej zbliżony do Javy (jedna "sekcja" zawsze), możesz to ukryć w kodzie — np.
 mieć stałą `_SECTION = "config"` na górze pliku, żeby nazwa sekcji nie była "magicznym stringiem" rozsianym po funkcjach.
+
+---
+
+# 📄DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)
+
+## Skąd problem
+
+- Trello API (i większość zewnętrznych API) zwraca JSON w `camelCase` (`descData`, `idOrganization`, `shortUrl`).
+- Konwencja Pythona (PEP 8) wymaga `snake_case` dla nazw pól/atrybutów — trzyma się jej cały ekosystem (stdlib, Django,
+  FastAPI), PyCharm też podkreśla camelCase jako naruszenie konwencji.
+- W Javie/Jacksonie ten sam problem rozwiązywał `@JsonProperty(value = "...")` na polu/parametrze konstruktora
+  (lub globalnie przez `@JsonNaming(...)` / `PropertyNamingStrategy` na `ObjectMapper`).
+
+## Trzy podejścia w Pydantic
+
+| Opcja                                       | Jak wygląda                                        | Plusy                                                                 | Minusy                                                                            |
+|---------------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| **Pola wprost camelCase**                   | `descData: DescDataDto`                            | zero konfiguracji                                                     | łamie PEP 8, niespójne z resztą projektu (configi, payloady są snake_case)        |
+| **`Field(alias=...)` per pole**             | `desc_data: DescDataDto = Field(alias="descData")` | pełna kontrola, jawność                                               | dużo powtarzalnego kodu przy DTO z wieloma polami                                 |
+| **`alias_generator` globalnie w `BaseDto`** | `alias_generator=to_camel` w `model_config`        | snake_case wszędzie, zero powtórzeń, najbliższe odpowiednikowi z Javy | trzeba pamiętać o `populate_by_name=True`; uważać na akronimy/cyfry w nazwach pól |
+
+**Wybrana opcja: `alias_generator=to_camel`** — spójna z resztą projektu (wszędzie indziej masz snake_case).
+
+## Jak działa `alias`
+
+- Domyślnie `alias` (ręczny lub wygenerowany) działa **tylko przy parsowaniu danych wejściowych** (np. `model_validate(response.json())`).
+- **Nie pozwala** automatycznie tworzyć obiektu ręcznie po nazwie pola Python — trzeba by wtedy podawać alias
+  (`BoardBaseDto(idOrganization=...)`), co jest niezgodne z konwencją reszty kodu.
+
+## Po co `populate_by_name=True`
+
+- Pozwala tworzyć obiekt **obiema metodami na raz**:
+  - po aliasie (camelCase) — automatycznie przy `model_validate()` z JSON-a,
+  - po nazwie pola Python (snake_case) — przy ręcznej konstrukcji w kodzie testowym, np. `BoardBaseDto(id_organization=..., short_url=...)`.
+- Bez tej flagi ręczne tworzenie obiektu po nazwie pola Python rzuci błąd walidacji.
+
+## Finalna konfiguracja w `BaseDto`
+
+```python
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
+
+
+class BaseDto(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        strict=True,
+        alias_generator=to_camel,      # snake_case (Python) -> camelCase (JSON), generowane automatycznie
+        populate_by_name=True,          # pozwala tworzyć obiekt też po nazwie pola snake_case, nie tylko po aliasie
+    )
+```
+
+Efekt: `id_organization` w Pythonie ↔ `idOrganization` w JSON-ie, bez ręcznego `Field(alias=...)` przy każdym polu.
+
+## Przykład użycia (oba tryby działają)
+
+```python
+# 1. Deserializacja z odpowiedzi API (przez wygenerowany alias)
+board = BoardBaseDto.model_validate(response.json())
+print(board.id_organization)  # dostęp zawsze po snake_case
+
+# 2. Ręczne tworzenie w teście (przez populate_by_name)
+board = BoardBaseDto(
+    id="507f1f77bcf86cd799439011",
+    name="Test Board",
+    id_organization="507f191e810c19729de860ea",
+    ...
+)
+```
+
+## Pułapka na przyszłość
+
+`to_camel` może dawać nieoczekiwane wyniki dla nazw pól z akronimami lub cyframi (np. `url_v2`, `id2`).  
+Warto to sprawdzić przy kolejnych DTO z Trello API, jeśli takie pola się pojawią.
+
+## Analogia do Javy (dla porównania)
+
+| Java (Jackson)                                                                                       | Python (Pydantic)                                                                            |
+|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| `@JsonProperty(value = "...")` na polu                                                               | `Field(alias="...")` na polu                                                                 |
+| `@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)` na klasie/globalnie             | `alias_generator=to_camel` w `model_config`                                                  |
+| Konstruktor Javy zawsze przyjmuje nazwy pól Java (adnotacje wpływają tylko na (de)serializację JSON) | `populate_by_name=True` żeby konstruktor Python też przyjmował nazwy pól Python obok aliasów |
