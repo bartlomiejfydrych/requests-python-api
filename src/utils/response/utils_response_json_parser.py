@@ -1,5 +1,3 @@
-# src/utils/response/utils_response_json_parser.py
-
 import json
 from typing import Any, Union
 
@@ -28,6 +26,7 @@ def parse_string_to_json(json_string: str) -> Any:
 # Brakujące/nadmiarowe/zmienione nazwy pól nie mają tu żadnego znaczenia.
 def parse_response_to_json(response: Response) -> Any:
     return parse_string_to_json(response.text)
+
 
 """
 UŻYCIE W TEŚCIE:
