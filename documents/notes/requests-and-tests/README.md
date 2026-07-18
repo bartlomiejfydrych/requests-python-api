@@ -427,10 +427,16 @@ Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszy�
 
 ## DTO
 
-1. W package `src/dto` tworzymy katalog zgodny z nazwą grupy endpointów w dokumentacji np. `boards`
-2. W package `src/dto/boards` jeśli zwracane odpowiedzi z naszego CRUD'a różnią się ilością parametrów, ale mają
+1. W package `src/dto` tworzymy plik o nazwie `base_dto.py`.  
+   Plik ten ma zawierać wszystkie ustawienia naszej deserializacji, czyli:
+   - `extra="forbid"` – fail, jeśli pojawią się jakieś nadmiarowe pola
+   - `strict=True` – wyłączenie zamiany liczb na stringi i stringów na liczby + booleany
+   - `alias_generator=to_camel` – służy do tego, aby nie musieć ręcznie dla zmiennych pisać aliasów w camelCase
+   - `populate_by_name=True` – pozwala tworzyć obiekt w kodzie Python PO NAZWIE POLA (snake_case), a nie tylko po aliasie (camelCase)
+2. W package `src/dto` tworzymy katalog zgodny z nazwą grupy endpointów w dokumentacji np. `boards`
+3. W package `src/dto/boards` jeśli zwracane odpowiedzi z naszego CRUD'a różnią się ilością parametrów, ale mają
    większość elementów wspólnych, to tworzymy plik, który będzie najpierw przechowywał te elementy wspólne np. `board_base_dto.py`
-3. Wklejamy do dowolnego **agenta AI** nasz wcześniej skopiowany response oraz dopisujemy, jakie są warunki dla pól,
+4. Wklejamy do dowolnego **agenta AI** nasz wcześniej skopiowany response oraz dopisujemy, jakie są warunki dla pól,
    jeśli takie znamy i prosimy go o przerobienie tego na DTO.  
    **Podajemy:**
    - informację, że chcemy to na DTO
@@ -439,6 +445,21 @@ Jeśli takie ostrzeżenie będzie się pojawiać częściej, możesz je wyciszy�
    - wszystkie pola mają być wymagane
    - ma być wykrywany brak jakiegoś pola
    - ma być wykrywane, jeśli pojawią się jakieś nadmiarowe pola
+5. Takie DTO składa się z:
+   - Zmiennych, które trzymają nazwy pól JSON, aby móc zmieniać te Stringi tylko w jednym miejscu w kodzie
+   - Pola klasy/obiektu/JSON z regułami walidacyjnymi
+6. Jeśli response ma w sobie inne klasy/obiekty to na nie też zakładamy osobne DTO. Najlepiej w jakimś wspólnym katalogu np. `board`
+7. Jeśli jakiś obiekt/klasa ma w sobie kolejny obiekt/klasę to wewnątrz tego zakładamy kolejny katalog np. `prefs`
+8. Mając **bazowe DTO**, robimy teraz DTO dla respons'ów konkretnych endpointów:
+   - `POST_create_board_dto`
+   - `GET_get_board_dto`
+   - Oraz DTO dla pod-obiektów wewnątrz nich, najlepiej zgrupowanych w nowy pod-package o nazwie `board`
+
+Dodatkowo, jeśli przy porównywaniu responsów będziemy chcieli pomijać jakieś pola, to żeby uniknąć podawania ich jako
+String (wtedy trzeba będzie ręcznie dokonywać jego aktualizacji w każdym miejscu występowania) warto je w tym DTO
+zapisywać jako zmienne np. `FIELD_LIMITS: ClassVar[str] = "limits"` dzięki czemu jak je tak wywołamy
+compareObjects(responsePostDto, responseGetDto, POST_CreateBoardDto.FIELD_LIMITS); to jak coś się tu zmieni,
+wtedy IDE dokona tej zmiany wszędzie.
 
 ---
 
