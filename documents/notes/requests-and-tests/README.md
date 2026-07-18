@@ -19,6 +19,7 @@
   - [Test – mały](#test--mały)
   - [Expected responses](#expected-responses)
   - [DTO](#dto)
+  - [Utils tests](#utils-tests)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 - [DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)](#dto--pydantic--aliasy-pól-camelcase-json--snake_case-python)
 
@@ -460,6 +461,27 @@ String (wtedy trzeba będzie ręcznie dokonywać jego aktualizacji w każdym mie
 zapisywać jako zmienne np. `FIELD_LIMITS: ClassVar[str] = "limits"` dzięki czemu jak je tak wywołamy
 compareObjects(responsePostDto, responseGetDto, POST_CreateBoardDto.FIELD_LIMITS); to jak coś się tu zmieni,
 wtedy IDE dokona tej zmiany wszędzie.
+
+## Utils tests
+
+1. W package `src` tworzymy package o nazwie `utils_tests`  
+   Katalog ten będzie służył do zbierania metod pomocniczych dla konkretnych klas z testami.
+2. W `src/utils_tests` tworzymy plik `POST_create_board_utils.py`
+3. W pliku `POST_create_board_utils.py` dodajemy takie metody jak:
+   - Metoda przygotowująca oczekiwany response POST:
+     - Przerabia (tylko deserializacja, bez walidacji) nasz oczekiwany String z responsem na obiekt DTO
+     - Zrównuje różniące się zazwyczaj pola np.:
+       - expectedResponsePostDto.name = boardName;
+       - expectedResponsePostDto.id = responsePostDto.id;
+     - I tak przygotowany obiekt jest zwracany i gotowy do porównywania w asercji
+   - Metodę do weryfikacji zgodności naszego POST z requestem GET:
+     - Wysyłany jest request GET
+     - Sprawdzany jest status code
+     - Response jest deserializowane i walidowane na obiekt DTO
+     - Porównywany jest obiekt response POST z obiektem response GET oraz pomijane są pola, których nie chcemy porównywać
+   - Metodę generującą losową nazwę tablicy:
+     - Dzięki nanoTime() jest mniejsza szansa na duplikację niż przy użyciu number().randomNumber()
+   - Metodę generującą losowy opis (`desc`)
 
 ---
 
