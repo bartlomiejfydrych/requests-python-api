@@ -20,6 +20,7 @@
   - [Expected responses](#expected-responses)
   - [DTO](#dto)
   - [Utils tests](#utils-tests)
+  - [Logi](#logi)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 - [DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)](#dto--pydantic--aliasy-pól-camelcase-json--snake_case-python)
 
@@ -482,6 +483,17 @@ wtedy IDE dokona tej zmiany wszędzie.
    - Metodę generującą losową nazwę tablicy:
      - Dzięki nanoTime() jest mniejsza szansa na duplikację niż przy użyciu number().randomNumber()
    - Metodę generującą losowy opis (`desc`)
+
+## Logi
+
+Przed rozpoczęciem pełnych testów na poważnie warto zaopatrzyć się w jakieś sposoby logowania przychodzących response,
+na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
+
+1. Instalujemy 2 dependencies:
+   - `Pygments` – służy do kolorowania JSON'a przychodzącego w response
+   - `colorma` – służy do kolorowania pozostałych rzeczy np. kod statusu itp.  
+     Gwarantuje poprawne działanie ANSI też poza konsolą PyCharm (np. gdybyś kiedyś odpalał to ze zwykłego `cmd.exe`)
+2. 
 
 ---
 

@@ -22,6 +22,8 @@
    - [assertpy](#assertpy)
    - [python-dotenv](#python-dotenv)
    - [deepdiff](#deepdiff)
+   - [Pygments](#pygments)
+   - [colorama](#colorama)
 
 ---
 
@@ -96,9 +98,11 @@
    - **assertpy** – Czytelniejsze asercje (`pip install assertpy`)
    - **python-dotenv** – Odczytywanie danych z pliku `.env` (`pip install python-dotenv`)
    - **deepdiff** – Rekurencyjne porównywanie danych (`pip install deepdiff`)
+   - **Pygments** – Kolorowanie JSON przychodzącego w response (`pip install Pygments`)
+   - **colorama** – Kolorowanie pozostałych rzeczy w konsoli również poza konsolą PyCharm np. w `cmd.exe` (`pip install colorama`)
    - Można też zainstalować wszystko naraz jednym poleceniem:
      ```bash
-     pip install pytest requests pydantic Faker assertpy python-dotenv deepdiff
+     pip install pytest requests pydantic Faker assertpy python-dotenv deepdiff Pygments colorama
      ```
 6. Po instalacji generujemy plik z zaleznościami (To taki odpowiednik `pom.xml` z Javy):
    ```bash
@@ -2098,7 +2102,7 @@ TOKEN = os.getenv("TOKEN")
 wykorzystywana do przechowywania konfiguracji aplikacji i testów (adresów API, danych logowania, tokenów, parametrów
 środowiskowych) poza kodem źródłowym, co ułatwia zarządzanie konfiguracją i zwiększa bezpieczeństwo.
 
-## deepdiff
+## 📕deepdiff
 
 **DeepDiff** to biblioteka Pythona służąca do **porównywania złożonych struktur danych** i wykrywania różnic między nimi.
 Potrafi analizować słowniki (`dict`), listy, obiekty, JSON-y, zagnieżdżone struktury oraz kombinacje tych typów.
@@ -2529,3 +2533,495 @@ Od razu wiadomo, co się zmieniło.
 **DeepDiff** – biblioteka Pythona służąca do porównywania złożonych struktur danych (słowników, list, JSON-ów i obiektów)
 oraz wykrywania szczegółowych różnic między nimi. Jest często wykorzystywana w testach API, regresyjnych i kontraktowych
 do analizy zmian w odpowiedziach systemu.
+
+## 📕Pygments
+
+**Pygments** to biblioteka Pythona służąca do **kolorowania składni (syntax highlighting)** kodu źródłowego.
+Rozpoznaje składnię wielu języków programowania i formatuje kod w czytelny sposób, np. jako HTML, ANSI
+(kolory w terminalu), RTF czy LaTeX.
+
+### Czym jest Pygments?
+
+Kod źródłowy bez kolorowania:
+
+```python
+def add(a, b):
+    return a + b
+```
+
+Po przetworzeniu przez Pygments:
+
+* słowa kluczowe (`def`, `return`) mają inny kolor,
+* nazwy funkcji są wyróżnione,
+* liczby, stringi i komentarze mają własne style.
+
+Dzięki temu kod jest łatwiejszy do czytania.
+
+### Do czego służy?
+
+Pygments jest wykorzystywany do:
+
+* kolorowania kodu w dokumentacji,
+* generowania raportów HTML,
+* wyświetlania kodu w terminalu,
+* tworzenia stron internetowych z przykładami kodu,
+* budowania dokumentacji technicznej.
+
+Wiele narzędzi korzysta z Pygments "pod spodem", np. generatory dokumentacji czy systemy publikujące kod.
+
+### Instalacja
+
+```bash
+pip install pygments
+```
+
+### Podstawowe użycie
+
+```python
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+
+code = """
+def hello():
+    print("Hello")
+"""
+
+html = highlight(
+    code,
+    PythonLexer(),
+    HtmlFormatter()
+)
+```
+
+Wynikiem będzie kod HTML z odpowiednimi znacznikami i klasami CSS odpowiadającymi kolorowaniu składni.
+
+### Najważniejsze elementy
+
+#### Lexer
+
+**Lexer** analizuje kod i rozpoznaje jego elementy, takie jak:
+
+* słowa kluczowe,
+* identyfikatory,
+* liczby,
+* komentarze,
+* operatory,
+* stringi.
+
+Przykład:
+
+```python
+from pygments.lexers import PythonLexer
+
+lexer = PythonLexer()
+```
+
+Dla innych języków dostępne są odpowiednie lexery, np.:
+
+```python
+from pygments.lexers import JsonLexer
+from pygments.lexers import SqlLexer
+```
+
+#### Formatter
+
+**Formatter** określa sposób prezentacji pokolorowanego kodu.
+
+Przykłady:
+
+```python
+from pygments.formatters import HtmlFormatter
+```
+
+lub
+
+```python
+from pygments.formatters import TerminalFormatter
+```
+
+Najczęściej używane formatery:
+
+* HTML,
+* Terminal,
+* LaTeX,
+* RTF,
+* SVG.
+
+### Automatyczne wykrywanie języka
+
+Pygments potrafi sam spróbować rozpoznać język:
+
+```python
+from pygments.lexers import guess_lexer
+
+lexer = guess_lexer(code)
+```
+
+Jest to wygodne przy pracy z plikami o nieznanej zawartości.
+
+### Kolorowanie w terminalu
+
+```python
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import TerminalFormatter
+
+print(
+    highlight(
+        code,
+        PythonLexer(),
+        TerminalFormatter()
+    )
+)
+```
+
+Kod zostanie wyświetlony z kolorami w terminalu obsługującym sekwencje ANSI.
+
+### Style
+
+Pygments oferuje wiele gotowych motywów kolorystycznych.
+
+Przykład:
+
+```python
+formatter = HtmlFormatter(style="monokai")
+```
+
+Inne popularne style:
+
+* `default`,
+* `friendly`,
+* `colorful`,
+* `monokai`,
+* `native`.
+
+### Obsługiwane języki
+
+Pygments wspiera setki języków i formatów, m.in.:
+
+* Python,
+* Java,
+* JavaScript,
+* TypeScript,
+* C,
+* C++,
+* C#,
+* Go,
+* Rust,
+* SQL,
+* HTML,
+* CSS,
+* XML,
+* YAML,
+* JSON,
+* Bash.
+
+### Typowe zastosowania w QA
+
+Choć Pygments nie jest biblioteką stricte testową, może być używany do:
+
+#### 1. Generowania raportów testowych
+
+Raport HTML może zawierać kolorowane:
+
+* requesty HTTP,
+* odpowiedzi API,
+* fragmenty kodu,
+* stack trace.
+
+#### 2. Dokumentacji frameworka testowego
+
+Przykłady kodu w dokumentacji są czytelniejsze dzięki kolorowaniu składni.
+
+#### 3. Narzędzi wewnętrznych
+
+Przykładowo aplikacja wyświetlająca logi lub pliki konfiguracyjne może używać Pygments do ich estetycznej prezentacji.
+
+### Integracja z innymi bibliotekami
+
+Pygments często współpracuje z:
+
+* Sphinx – generowanie dokumentacji,
+* MkDocs – dokumentacja projektów,
+* Jupyter – prezentacja kodu w notebookach (w zależności od konfiguracji i użytych komponentów).
+
+### Zalety
+
+* obsługuje setki języków programowania,
+* oferuje wiele formatów wyjściowych (HTML, terminal, LaTeX itd.),
+* posiada liczne gotowe style kolorowania,
+* jest szybki i łatwy w użyciu,
+* dobrze integruje się z narzędziami do dokumentacji.
+
+### Ograniczenia
+
+* nie analizuje poprawności kodu – jedynie rozpoznaje jego składnię,
+* nie jest formatterem ani linterem,
+* jego głównym celem jest poprawa czytelności kodu.
+
+### Czy tester automatyzujący będzie z niego korzystał?
+
+Bezpośrednio – **raczej rzadko**. Większość testerów nie używa Pygments w swoich testach. Można się z nim jednak spotkać
+pośrednio, ponieważ jest wykorzystywany przez narzędzia generujące dokumentację, raporty lub prezentujące kod źródłowy.
+
+### Krótka definicja do notatek
+
+**Pygments** – biblioteka Pythona służąca do kolorowania składni kodu źródłowego (syntax highlighting).
+Rozpoznaje składnię wielu języków programowania i umożliwia prezentację kodu w różnych formatach, takich jak HTML,
+terminal czy LaTeX. Jest szeroko wykorzystywana w narzędziach do dokumentacji, raportowania oraz prezentacji kodu.
+
+## 📕colorama
+
+**Colorama** to biblioteka Pythona służąca do **wyświetlania kolorowego tekstu i formatowania wyjścia w terminalu**.
+Umożliwia stosowanie kolorów, jasności tekstu oraz kolorów tła w sposób przenośny między różnymi systemami operacyjnymi,
+szczególnie zapewniając poprawne działanie sekwencji ANSI w systemie Windows.
+
+### Czym jest Colorama?
+
+Domyślnie tekst wyświetlany w terminalu wygląda tak:
+
+```python
+print("Test zakończony sukcesem")
+```
+
+Z Colorama można wyróżnić komunikaty kolorami:
+
+```python
+from colorama import Fore
+
+print(Fore.GREEN + "Test zakończony sukcesem")
+```
+
+Efekt:
+
+* tekst będzie wyświetlony na zielono.
+
+### Do czego służy?
+
+Colorama jest wykorzystywana do:
+
+* kolorowania komunikatów w terminalu,
+* wyróżniania błędów i ostrzeżeń,
+* poprawy czytelności logów,
+* tworzenia czytelniejszych narzędzi CLI (Command Line Interface).
+
+### Instalacja
+
+```bash
+pip install colorama
+```
+
+### Inicjalizacja
+
+Najczęściej na początku programu:
+
+```python
+from colorama import init
+
+init()
+```
+
+W nowszych wersjach biblioteka automatycznie wspiera nowoczesne terminale, jednak wywołanie `init()` nadal jest często
+spotykane w starszym kodzie i dla zachowania kompatybilności.
+
+### Kolory tekstu
+
+Import:
+
+```python
+from colorama import Fore
+```
+
+Przykłady:
+
+```python
+print(Fore.RED + "Błąd")
+```
+
+```python
+print(Fore.GREEN + "Sukces")
+```
+
+```python
+print(Fore.YELLOW + "Ostrzeżenie")
+```
+
+```python
+print(Fore.BLUE + "Informacja")
+```
+
+Dostępne są m.in.:
+
+* `BLACK`
+* `RED`
+* `GREEN`
+* `YELLOW`
+* `BLUE`
+* `MAGENTA`
+* `CYAN`
+* `WHITE`
+
+### Resetowanie koloru
+
+Po zmianie koloru warto go zresetować:
+
+```python
+from colorama import Fore
+
+print(Fore.RED + "Błąd" + Fore.RESET)
+```
+
+Lub wygodniej:
+
+```python
+from colorama import Style
+
+print(Fore.RED + "Błąd" + Style.RESET_ALL)
+```
+
+### Kolory tła
+
+Import:
+
+```python
+from colorama import Back
+```
+
+Przykład:
+
+```python
+print(
+    Back.YELLOW +
+    Fore.BLACK +
+    "UWAGA"
+)
+```
+
+Tekst będzie czarny na żółtym tle.
+
+### Style tekstu
+
+Import:
+
+```python
+from colorama import Style
+```
+
+Przykład:
+
+```python
+print(
+    Style.BRIGHT +
+    "Ważny komunikat"
+)
+```
+
+Najczęściej używane:
+
+* `DIM`
+* `NORMAL`
+* `BRIGHT`
+* `RESET_ALL`
+
+### Automatyczny reset
+
+Można włączyć automatyczne resetowanie stylów:
+
+```python
+from colorama import init
+
+init(autoreset=True)
+```
+
+Wtedy nie trzeba pisać:
+
+```python
+Style.RESET_ALL
+```
+
+po każdym komunikacie.
+
+### Typowe zastosowania w QA
+
+#### 1. Wyniki testów
+
+```python
+from colorama import Fore
+
+print(Fore.GREEN + "PASS")
+print(Fore.RED + "FAIL")
+```
+
+#### 2. Logowanie
+
+```python
+print(Fore.YELLOW + "Wysyłanie requesta...")
+```
+
+```python
+print(Fore.CYAN + "Odpowiedź API")
+```
+
+#### 3. Debugowanie
+
+```python
+print(Fore.RED + str(exception))
+```
+
+Błędy są od razu widoczne.
+
+#### 4. Własne narzędzia CLI
+
+Przykład:
+
+```text
+✓ Wszystkie testy zakończone sukcesem
+```
+
+na zielono,
+
+lub
+
+```text
+✗ Test zakończony niepowodzeniem
+```
+
+na czerwono.
+
+### Integracja z pytest
+
+Colorama nie jest bezpośrednio związana z pytest, ale można jej używać do kolorowania własnych komunikatów:
+
+```python
+from colorama import Fore
+
+def test_login():
+
+    print(Fore.CYAN + "Logowanie użytkownika")
+
+    assert True
+```
+
+Warto jednak pamiętać, że sam pytest już domyślnie koloruje wyniki testów (`PASSED`, `FAILED`, `ERROR`), więc Colorama
+jest przydatna głównie do własnych logów i komunikatów.
+
+### Zalety
+
+* bardzo prosta w użyciu,
+* działa na różnych systemach operacyjnych,
+* poprawia czytelność logów,
+* ułatwia tworzenie estetycznych aplikacji konsolowych,
+* dobrze współpracuje z innymi bibliotekami CLI.
+
+### Ograniczenia
+
+* działa wyłącznie w terminalu,
+* nie generuje raportów HTML ani PDF,
+* odpowiada jedynie za wygląd tekstu, nie za logikę programu.
+
+### Krótka definicja do notatek
+
+**Colorama** – biblioteka Pythona umożliwiająca kolorowanie i formatowanie tekstu wyświetlanego w terminalu.
+Zapewnia przenośną obsługę kolorów ANSI (szczególnie na systemie Windows) i jest wykorzystywana do tworzenia
+czytelniejszych logów, komunikatów oraz aplikacji konsolowych.
