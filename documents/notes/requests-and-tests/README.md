@@ -493,7 +493,13 @@ na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
    - `Pygments` – służy do kolorowania JSON'a przychodzącego w response
    - `colorma` – służy do kolorowania pozostałych rzeczy np. kod statusu itp.  
      Gwarantuje poprawne działanie ANSI też poza konsolą PyCharm (np. gdybyś kiedyś odpalał to ze zwykłego `cmd.exe`)
-2. 
+2. W package `src` tworzymy package o nazwie `loggers`
+3. W package `src/loggers` tworzymy plik o nazwie `console_colors.py`.  
+   Będzie on odpowiedzialny za nadawanie kolorów w konsoli.
+4. W package `src/loggers` tworzymy plik o nazwie `json_color_printer.py`.  
+   Będzie on odpowiedzialny za kolorowanie zwracanego JSON przez response.
+5. W package `src/utils` tworzymy plik o nazwie `utils_sensitive_data_masker.py`  
+   Będzie on służył do maskowania danych poufnych w query parametrach np. klucz API i token.
 
 ---
 
