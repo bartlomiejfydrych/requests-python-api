@@ -20,18 +20,32 @@ def print_json(json_text: str, color_enabled: bool) -> None:
     try:
         parsed = json.loads(json_text)
     except JSONDecodeError:
-        # NOTE FOR ME: Tak jak w Javie - ostrzeżenie, tylko gdy {color_enabled}, ale surowy tekst zawsze.
+        # NOTE FOR ME: Tak jak w Javie - ostrzeżenie tylko gdy {color_enabled}, ale surowy tekst zawsze.
         if color_enabled:
             yellow("Invalid JSON. Display as text:", color_enabled)
         print(json_text)
         return
 
+    _print_formatted(parsed, color_enabled)
+
+
+# NOTE FOR ME:
+# Wariant dla przypadków, gdzie dane są już gotowym, poprawnym {dict} (np. zamaskowane {headers}/
+# {query params} w {console_formatter.py}) - pomija zbędny roundtrip {dict -> str -> json.loads -> str},
+# bo nie ma tu ryzyka "invalid JSON" (nie parsujemy tekstu z zewnątrz, tylko własną, pewną strukturę).
+def print_pretty(data: dict, color_enabled: bool) -> None:
+    _print_formatted(data, color_enabled)
+
+
+# ==========================================================================================================
+# METHODS – SUB
+# ==========================================================================================================
+
+def _print_formatted(parsed, color_enabled: bool) -> None:
     # NOTE FOR ME: {indent=2} odpowiada Javowemu {"  ".repeat(level)} (2 spacje na poziom zagnieżdżenia).
     formatted = json.dumps(parsed, ensure_ascii=False, indent=2)
 
     if color_enabled:
-        # NOTE FOR ME: {end=""} bo {highlight()} z Pygments sam dokleja już jeden znak nowej linii na końcu -
-        # bez tego mielibyśmy podwójny odstęp względem wersji bez koloru.
         print(highlight(formatted, JsonLexer(), TerminalFormatter()), end="")
     else:
         print(formatted)

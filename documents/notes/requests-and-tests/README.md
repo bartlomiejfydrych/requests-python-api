@@ -500,6 +500,8 @@ na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
    Będzie on odpowiedzialny za kolorowanie zwracanego JSON przez response.
 5. W package `src/utils` tworzymy plik o nazwie `utils_sensitive_data_masker.py`  
    Będzie on służył do maskowania danych poufnych w query parametrach np. klucz API i token.
+6. W package `src/loggers` tworzymy plik o nazwie `console_formatter.py`.  
+   Będzie on łączył kolory pozostałych elementów, kolorowy JSON oraz maskowanie danych poufnych.
 
 ---
 
