@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from loggers import http_logger
 
 import requests
 
@@ -35,7 +36,9 @@ class BaseRequestSpec(requests.Session):
             self.params.update(default_params)
 
     def request(self, method, url, *args, **kwargs):
-        return super().request(method, self._build_url(url), *args, **kwargs)
+        response = super().request(method, self._build_url(url), *args, **kwargs)
+        http_logger.log(response)
+        return response
 
     def _build_url(self, url: Union[str, bytes]) -> str:
         # NOTE FOR ME: {requests.Session.request} dopuszcza {url} jako str lub bytes,

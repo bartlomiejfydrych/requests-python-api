@@ -502,6 +502,20 @@ na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
    Będzie on służył do maskowania danych poufnych w query parametrach np. klucz API i token.
 6. W package `src/loggers` tworzymy plik o nazwie `console_formatter.py`.  
    Będzie on łączył kolory pozostałych elementów, kolorowy JSON oraz maskowanie danych poufnych.
+7. W package `src/loggers` tworzymy plik o nazwie `console_full_formatter.py`.  
+   Będzie on wyświetlał wszystkie, surowe logi, bez kolorów i bez maskowania.
+8. W package `src/loggers` tworzymy plik o nazwie `http_logger.py`.  
+   Jest to punkt wejścia, który na podstawie `LogsMode` z `config.py` będzie decydował co wywołać.
+9. W pliku `src/configuration/requests_session/base_request_spec.py` robimy import:  
+   `from loggers import http_logger`
+10. I dopisujemy wywoływanie metody tutaj:  
+    ```python
+        def request(self, method, url, *args, **kwargs):
+            response = super().request(method, self._build_url(url), *args, **kwargs)
+            http_logger.log(response)
+            return response
+    ```
+11. Teraz w pliku `.evn` możemy zarządzać włączaniem/wyłączaniem logów oraz ich ustawieniami.
 
 ---
 
