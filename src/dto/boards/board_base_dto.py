@@ -49,7 +49,7 @@ class BoardBaseDto(BaseDto):
     # NOTE FOR ME:
     # Odpowiednik @Valid - wystarczy, że typ pola to klasa dziedzicząca po BaseDto.
     # Pydantic waliduje zagnieżdżone obiekty rekurencyjnie automatycznie, bez dodatkowej adnotacji.
-    desc_data: DescDataDto
+    desc_data: DescDataDto | None
 
     closed: bool
 

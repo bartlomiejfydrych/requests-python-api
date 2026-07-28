@@ -42,8 +42,10 @@ import copy
 import json
 import re
 from typing import Any, List, Tuple
+from dataclasses import asdict, is_dataclass
 
 from deepdiff import DeepDiff
+from pydantic import BaseModel
 
 
 # ==========================================================================================================
@@ -121,10 +123,32 @@ def _exclude_regex_paths(fields_to_ignore: Tuple[str, ...]) -> List[str]:
     return [_build_field_name_regex(f) for f in fields_to_ignore]
 
 
+def _normalize_for_comparison(obj: Any) -> Any:
+    """
+    NOTES FOR ME:
+    Normalizes objects before comparing them with DeepDiff.
+
+    - Pydantic models -> dict (using JSON aliases, if defined)
+    - dataclasses -> dict
+    - other objects -> unchanged
+
+    Thanks to this, two different DTO classes having the same structure
+    (e.g. POST_CreateBoardDto vs GET_GetBoardDto) can still be compared
+    recursively, similarly to AssertJ usingRecursiveComparison().
+    """
+    if isinstance(obj, BaseModel):
+        return obj.model_dump(mode="python", by_alias=True)
+
+    if is_dataclass(obj):
+        return asdict(obj)
+
+    return obj
+
+
 def _recursive_diff(actual: Any, expected: Any, fields_to_ignore: Tuple[str, ...]) -> DeepDiff:
     return DeepDiff(
-        expected,
-        actual,
+        _normalize_for_comparison(expected),
+        _normalize_for_comparison(actual),
         exclude_regex_paths=_exclude_regex_paths(fields_to_ignore),
     )
 

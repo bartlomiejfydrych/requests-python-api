@@ -52,7 +52,7 @@ class PrefsDto(BaseDto):
 
     permission_level: str = Field(pattern=r"^(org|private|public)$")
     hide_votes: bool
-    voting: str = Field(pattern=r"^(org|private|public)$")
+    voting: str = Field(pattern=r"^(org|private|public|disabled)$")
     comments: str = Field(pattern=r"^(disabled|members|observers|org|public)$")
     invitations: str = Field(pattern=r"^(members|admins)$")
 
