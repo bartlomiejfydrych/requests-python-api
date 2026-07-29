@@ -22,6 +22,7 @@
   - [Utils tests](#utils-tests)
   - [Logi](#logi)
   - [Test – ostateczny](#test--ostateczny)
+  - [Dokumentacja](#dokumentacja)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 - [DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)](#dto--pydantic--aliasy-pól-camelcase-json--snake_case-python)
 
@@ -546,6 +547,28 @@ na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
    - Porównujemy oba obiekty, ale musimy pamiętać by ignorować/wykluczać pola, które się różnią lub są nadmiarowe lub brakujące
    - Wysyłamy request GET, który jako metoda pomocnicza sprawdza zgodność z responsem POST
    - Fixture/Metoda `def delete_board(self)` z adnotacją `@pytest.fixture(autouse=True)` automatycznie usuwa stworzony zasób wysyłając request **DELETE**
+
+## Dokumentacja
+
+1. Przygotowujemy sobie dokumentację testową dla danego requesta/ednpointa
+2. W głównym katalogu **projektu** tworzymy katalog o nazwie `documentation`
+3. W katalogu `documentation` tworzymy katalog o nazwie `endpoints`
+4. W katalogu `documentation/endpoints` tworzymy katalog o nazwie `boards` (zgodnie ze strukturą dokumentacji API)
+5. W katalogu `documentation/endpoints/boards` tworzymy plik o nazwie `POST_CreateBoard.md`
+6. W przypadku słabego prowadzenia lub nawet braku głównej dokumentacji API w projekcie testerzy mogą w takich plikach prowadzić własne notatki np.:
+   - Metoda – nazwa endpointu
+   - Endpoint (URL)
+   - Opis
+   - Ważne notatki i uwagi
+   - Pokrycie testami:
+     - Wklejamy cały payload lub listę wszystkich możliwych parametrów, jakie możemy podać w body
+     - Pod każdym parametrem tworzymy sekcję na przypadki pozytywne i negatywne
+     - Rozpisujemy wszystkie możliwe przypadki, jakie możemy podać w ramach testów
+     - Przed każdym z nich wpisujemy oznaczenie testu, który pokrywa dany przypadek np. `[P1] Podanie tylko tego, wymaganego parametru`
+     - Dla GET'ów, na które mogą mieć wpływ różne kombinacje endpointów/danych wklejamy response
+     - I tu również pod każdym parametrem rozpisujemy przypadki testowe, czyli możliwe dane, jakie mogą/powinny wpadać
+   - Query params / Payload
+   - Response
 
 ---
 
