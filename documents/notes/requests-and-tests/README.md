@@ -21,6 +21,7 @@
   - [DTO](#dto)
   - [Utils tests](#utils-tests)
   - [Logi](#logi)
+  - [Test – ostateczny](#test--ostateczny)
 - [config.ini – Wymagalność podziału na sekcje](#configini--wymagalność-podziału-na-sekcje)
 - [DTO → Pydantic – aliasy pól (camelCase JSON ↔ snake_case Python)](#dto--pydantic--aliasy-pól-camelcase-json--snake_case-python)
 
@@ -516,6 +517,35 @@ na wypadek, gdybyśmy mieli jakieś błędy w testach i zwracanych danych.
             return response
     ```
 11. Teraz w pliku `.evn` możemy zarządzać włączaniem/wyłączaniem logów oraz ich ustawieniami.
+
+## Test – ostateczny
+
+1. Otwieramy nasz pierwszy plik z testami `src/tests/api_trello/boards/test_POST_create_board.py`
+2. Na cały plik/klasę deklarujemy zmienne, jakich będziemy re-używać np. ID. W tym przypadku `board_id: Optional[str] = None`
+3. Piszemy fixture/metodę `def delete_board(self)` z adnotacją `@pytest.fixture(autouse=True)` (działanie niejawne dla wszystkich testów)  
+   - Zawsze, po każdym teście będzie wywoływana i odpowiedzialna za sprzątanie/usuwanie zasobu (tablicy)
+   - Sprawdza, czy `board_id` jest różne od `null`
+   - Jeśli tak, to wysyłany jest request `DELETE` pod to `ID`
+   - Sprawdzane jest, czy jego `status code = 200`
+   - Na koniec możemy dla pewności dopisać, żeby zmienna `board_id` była ponownie ustawiana na `null`
+4. Dodajemy pierwszy test o nazwie `def test_p1_should_create_board_whose_name_contains_special_characters_and_numbers(self) -> None:`
+   - Dzięki słówku `test_` na początku nazwy **Pytest** wie, że to jest test
+   - Stwierdziłem, że fajnie będzie oznaczać jakoś testy np. w przypadku mierzenia pokrycia, wiedzieć który test co pokrywa:
+     - p1, p2, p3 itd. oznaczenie dla testów pozytywnych
+     - n1, n2, n3 itd. oznaczenie dla testów negatywnych
+5. W teście piszemy następujące rzeczy:
+   - Na samej górze deklarujemy zmienne np. `losową nazwę tablicy`
+   - Wysyłamy request POST wraz z parametrami/body i zapisujemy do zmiennej typu `response`
+   - Sprawdzamy `status code`
+   - Zapisujemy `ID` zasobu do zmiennej
+   - Deserializujemy i walidujemy ten response na obiekt DTO `POST_CreateBoardDto`
+   - Przygotowujemy oczekiwany response POST:
+     - Importujemy go jako `String`
+     - Deserializujemy do DTO `POST_CreateBoardDto`
+     - Dla pól, które zawsze się różnią, przypisujemy tutaj te z response POST np. `expected_response_post_dto.id = response_post_dto.id`
+   - Porównujemy oba obiekty, ale musimy pamiętać by ignorować/wykluczać pola, które się różnią lub są nadmiarowe lub brakujące
+   - Wysyłamy request GET, który jako metoda pomocnicza sprawdza zgodność z responsem POST
+   - Fixture/Metoda `def delete_board(self)` z adnotacją `@pytest.fixture(autouse=True)` automatycznie usuwa stworzony zasób wysyłając request **DELETE**
 
 ---
 
