@@ -24,6 +24,7 @@
    - [deepdiff](#deepdiff)
    - [Pygments](#pygments)
    - [colorama](#colorama)
+   - [allure-pytest](#allure-pytest)
 
 ---
 
@@ -100,6 +101,7 @@
    - **deepdiff** – Rekurencyjne porównywanie danych (`pip install deepdiff`)
    - **Pygments** – Kolorowanie JSON przychodzącego w response (`pip install Pygments`)
    - **colorama** – Kolorowanie pozostałych rzeczy w konsoli również poza konsolą PyCharm np. w `cmd.exe` (`pip install colorama`)
+   - **allure-pytest** – Generowanie raportów z testów (`pip install allure-pytest`)
    - Można też zainstalować wszystko naraz jednym poleceniem:
      ```bash
      pip install pytest requests pydantic Faker assertpy python-dotenv deepdiff Pygments colorama
@@ -3025,3 +3027,306 @@ jest przydatna głównie do własnych logów i komunikatów.
 **Colorama** – biblioteka Pythona umożliwiająca kolorowanie i formatowanie tekstu wyświetlanego w terminalu.
 Zapewnia przenośną obsługę kolorów ANSI (szczególnie na systemie Windows) i jest wykorzystywana do tworzenia
 czytelniejszych logów, komunikatów oraz aplikacji konsolowych.
+
+## 📕allure-pytest
+
+**allure-pytest** to wtyczka dla pytest integrująca testy z frameworkiem raportowania Allure Report.
+Umożliwia automatyczne zbieranie wyników testów oraz generowanie interaktywnych, czytelnych raportów HTML
+zawierających informacje o przebiegu testów, krokach, załącznikach, błędach i statystykach.
+
+### Czym jest allure-pytest?
+
+Domyślny raport pytest wygląda mniej więcej tak:
+
+```text
+========================
+5 passed
+2 failed
+========================
+```
+
+Po użyciu `allure-pytest` można wygenerować rozbudowany raport zawierający m.in.:
+
+* listę wykonanych testów,
+* status każdego testu,
+* czas wykonania,
+* szczegóły błędów,
+* historię uruchomień,
+* kroki testowe,
+* załączniki (np. logi, zrzuty ekranu, odpowiedzi API),
+* wykresy i statystyki.
+
+### Jak działa?
+
+Proces wygląda następująco:
+
+```text
+pytest
+        │
+        ▼
+allure-pytest
+        │
+        ▼
+pliki wyników (.json)
+        │
+        ▼
+Allure Report
+        │
+        ▼
+interaktywny raport HTML
+```
+
+Sama wtyczka **nie generuje raportu HTML** – zapisuje wyniki testów w formacie zrozumiałym dla Allure Report.
+
+### Instalacja
+
+Instalacja wtyczki:
+
+```bash
+pip install allure-pytest
+```
+
+Dodatkowo należy zainstalować narzędzie **Allure Report CLI**, które generuje raport HTML z zapisanych wyników.
+
+### Uruchamianie testów
+
+```bash
+pytest --alluredir=allure-results
+```
+
+Po zakończeniu testów powstanie katalog:
+
+```text
+allure-results/
+```
+
+zawierający pliki opisujące przebieg testów.
+
+### Generowanie raportu
+
+Po wykonaniu testów:
+
+```bash
+allure generate allure-results
+```
+
+lub
+
+```bash
+allure serve allure-results
+```
+
+Polecenie `serve` generuje raport i uruchamia lokalny serwer, otwierając go automatycznie w przeglądarce.
+
+### Podstawowe użycie
+
+Najprostszy test:
+
+```python
+def test_login():
+    assert True
+```
+
+Po uruchomieniu z `--alluredir` zostanie automatycznie uwzględniony w raporcie.
+
+### Opisy testów
+
+Można dodać bardziej czytelne nazwy:
+
+```python
+import allure
+
+@allure.title("Logowanie poprawnego użytkownika")
+def test_login():
+    ...
+```
+
+### Opisy funkcjonalności
+
+```python
+@allure.feature("Logowanie")
+@allure.story("Poprawne logowanie")
+def test_login():
+    ...
+```
+
+Raport grupuje testy według funkcjonalności.
+
+### Severity
+
+Można oznaczyć ważność testów:
+
+```python
+@allure.severity(
+    allure.severity_level.CRITICAL
+)
+def test_login():
+    ...
+```
+
+Dostępne poziomy:
+
+* BLOCKER
+* CRITICAL
+* NORMAL
+* MINOR
+* TRIVIAL
+
+### Kroki (Steps)
+
+Jedna z najbardziej przydatnych funkcji.
+
+```python
+import allure
+
+@allure.step("Logowanie użytkownika")
+def login():
+    ...
+```
+
+lub:
+
+```python
+def test_login():
+
+    with allure.step("Wysłanie requesta"):
+        ...
+
+    with allure.step("Sprawdzenie odpowiedzi"):
+        ...
+```
+
+Raport pokazuje wykonane kroki w kolejności.
+
+### Załączniki
+
+Można dołączać praktycznie dowolne pliki.
+
+Przykład tekstu:
+
+```python
+allure.attach(
+    response.text,
+    name="Response"
+)
+```
+
+Przykład JSON:
+
+```python
+allure.attach(
+    json.dumps(
+        response.json(),
+        indent=4
+    ),
+    name="Response JSON"
+)
+```
+
+Można również dołączać:
+
+* screenshoty,
+* logi,
+* pliki XML,
+* pliki PDF,
+* nagrania wideo.
+
+### Załączanie screenshotów
+
+Bardzo popularne przy testach UI.
+
+```python
+allure.attach.file(
+    "screenshot.png",
+    name="Screenshot"
+)
+```
+
+Po nieudanym teście screenshot będzie dostępny bezpośrednio w raporcie.
+
+### Parametry testów
+
+Dla testów parametryzowanych:
+
+```python
+@pytest.mark.parametrize(
+    "user",
+    ["admin", "guest"]
+)
+def test_login(user):
+    ...
+```
+
+Raport pokaże osobne wykonanie dla każdego zestawu danych.
+
+### Integracja z pytest
+
+Typowy test:
+
+```python
+import allure
+
+@allure.title("Pobranie użytkownika")
+def test_get_user():
+
+    with allure.step("Wysłanie requesta"):
+        response = requests.get(...)
+
+    with allure.step("Walidacja odpowiedzi"):
+        assert response.status_code == 200
+```
+
+Każdy krok pojawi się w raporcie.
+
+### Typowe zastosowania w QA
+
+#### 1. Raporty z testów API
+
+Dołączanie:
+
+* requestów,
+* response,
+* nagłówków,
+* logów.
+
+#### 2. Testy UI
+
+Załączanie:
+
+* screenshotów,
+* nagrań,
+* stack trace.
+
+#### 3. CI/CD
+
+Raport może być generowany automatycznie po każdym uruchomieniu pipeline.
+
+#### 4. Analiza błędów
+
+Dzięki krokom i załącznikom łatwo ustalić:
+
+* co wykonał test,
+* na którym etapie nastąpił błąd,
+* jaka była odpowiedź systemu.
+
+### Zalety
+
+* bardzo czytelne raporty HTML,
+* możliwość dodawania kroków,
+* obsługa screenshotów, logów i innych załączników,
+* grupowanie testów według funkcjonalności,
+* integracja z pytest i pipeline'ami CI/CD,
+* statystyki i historia uruchomień.
+
+### Ograniczenia
+
+* wymaga instalacji narzędzia Allure Report CLI do generowania raportów,
+* dodanie opisów i kroków wymaga dodatkowych dekoratorów lub wywołań API,
+* przy dużej liczbie załączników raport może zajmować dużo miejsca na dysku.
+
+# Krótka definicja do notatek
+
+**allure-pytest** – wtyczka do pytest umożliwiająca integrację z Allure Report. Zbiera wyniki testów i zapisuje je w
+formacie wykorzystywanym przez Allure do generowania interaktywnych raportów HTML. Pozwala wzbogacać raporty o kroki
+testowe, opisy, poziomy ważności, załączniki (np. logi, odpowiedzi API, zrzuty ekranu) oraz szczegółowe informacje
+o przebiegu testów, co ułatwia analizę wyników i diagnozowanie błędów.

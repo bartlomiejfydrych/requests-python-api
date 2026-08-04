@@ -1,8 +1,9 @@
+import allure
 import requests
 
 from configuration.config import get_logs_custom_color, get_logs_custom_optional, get_logs_mode
 from enums.configuration.logs_mode import LogsMode
-from loggers import console_formatter, console_full_formatter
+from loggers import allure_formatter, console_formatter, console_full_formatter
 
 
 # NOTE FOR ME:
@@ -36,3 +37,12 @@ def log(response: requests.Response) -> None:
 
     elif mode == LogsMode.OFF:
         pass  # brak logów konsoli
+
+    # ✅ ALLURE zawsze działa (niezależnie od LOGS_MODE)
+    attachment = allure_formatter.format_attachment(response)
+    allure.attach(
+        attachment.content,
+        name=attachment.title,
+        attachment_type=allure.attachment_type.JSON,
+        extension="json",
+    )
