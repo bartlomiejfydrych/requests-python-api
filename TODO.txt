@@ -1,10 +1,10 @@
 PRZEPISANE SEKCJE:
 
-–
+– dto
 
 SEKCJE DO PRZEPISANIA:
 
-– dto -> lists
+–
 
 LISTA RZECZY DO ZROBIENIA:
 
