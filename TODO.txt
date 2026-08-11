@@ -4,7 +4,9 @@ PRZEPISANE SEKCJE:
 
 SEKCJE DO PRZEPISANIA:
 
-–
+– endpoints/labels
+– endpoints/lists
+– endpoints/utils
 
 LISTA RZECZY DO ZROBIENIA:
 
