@@ -1,12 +1,11 @@
 PRZEPISANE SEKCJE:
 
 – dto
+– endpoints
 
 SEKCJE DO PRZEPISANIA:
 
-– endpoints/labels
-– endpoints/lists
-– endpoints/utils
+–
 
 LISTA RZECZY DO ZROBIENIA:
 
