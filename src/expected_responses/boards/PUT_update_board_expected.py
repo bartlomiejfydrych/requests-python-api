@@ -2,244 +2,150 @@
 # POSITIVE TESTS
 # ==========================================================================================================
 
-P1_EXPECTED_POST_BOARD_RESPONSE: str = """
+P1_EXPECTED_PUT_BOARD_RESPONSE: str = """
 {
-    "id": "68063bdc4bdbd152d658851a",
-    "name": "Hegmann, West and Rice board com.github.javafaker.Number@1320e68a",
+    "id": "687d190eaa0118f9edc0a4b6",
+    "name": "nć~ęrzWIJB+}([EP\\"2Ćuźw>cAaL-/ż1g)Y!5C@Ł9SO3l\\\\oU0vp&ĘbłjXRq.]Ą#*;'8<4`s%ió,6 {dHNk?K:DfV\\\\xtŚQŻmąZFTŃhŹ=$ey7_Ó^|Gś\\\\Mń",
+    "desc": "bQŹ<gWódyuIUż3)vaę[ńP.EfjMLs' 9]Ó2Ż*p5no|ZĘŃh(VRCtŚqź!e,?TŁ\\"izłF&_ś-$#/:`Bm\\\\0K\\\\=1G^OSH4ND}76ĆAĄ;>cą\\\\J8l+@%Ykx{rwć~X",
+    "descData": {
+        "emoji": {
+
+        }
+    },
+    "closed": true,
+    "idOrganization": "67d9d5e34d7b900257deed0e",
+    "idEnterprise": null,
+    "pinned": false,
+    "url": "https://trello.com/b/BKah2WgP/n%C4%87%C4%99rzwijbep2%C4%87u%C5%BAwcaal-%C5%BC1gy5c%C5%829so3l-ou0vp%C4%99b%C5%82jxrq%C4%8584si%C3%B36-dhnkkdfv-xt%C5%9Bq%C5%BCm%C4%85zft%C5%84h%C5%BAey7%C3%B3g%C5%9B-m%C5%84",
+    "shortUrl": "https://trello.com/b/BKah2WgP",
+    "prefs": {
+        "permissionLevel": "org",
+        "hideVotes": true,
+        "voting": "disabled",
+        "comments": "disabled",
+        "invitations": "admins",
+        "selfJoin": true,
+        "cardCovers": true,
+        "showCompleteStatus": true,
+        "cardCounts": false,
+        "isTemplate": false,
+        "cardAging": "regular",
+        "calendarFeedEnabled": true,
+        "hiddenPluginBoardButtons": [
+
+        ],
+        "switcherViews": [
+            {
+                "viewType": "Board",
+                "enabled": true
+            },
+            {
+                "viewType": "Table",
+                "enabled": true
+            },
+            {
+                "viewType": "Calendar",
+                "enabled": false
+            },
+            {
+                "viewType": "Dashboard",
+                "enabled": false
+            },
+            {
+                "viewType": "Timeline",
+                "enabled": false
+            },
+            {
+                "viewType": "Map",
+                "enabled": false
+            }
+        ],
+        "autoArchive": null,
+        "background": "blue",
+        "backgroundColor": "#0079BF",
+        "backgroundDarkColor": null,
+        "backgroundImage": null,
+        "backgroundDarkImage": null,
+        "backgroundImageScaled": null,
+        "backgroundTile": false,
+        "backgroundBrightness": "dark",
+        "sharedSourceUrl": null,
+        "backgroundBottomColor": "#0079BF",
+        "backgroundTopColor": "#0079BF",
+        "canBePublic": true,
+        "canBeEnterprise": true,
+        "canBeOrg": true,
+        "canBePrivate": true,
+        "canInvite": true
+    },
+    "labelNames": {
+        "green": "",
+        "yellow": "",
+        "orange": "",
+        "red": "",
+        "purple": "",
+        "blue": "",
+        "sky": "",
+        "lime": "",
+        "pink": "",
+        "black": "",
+        "green_dark": "",
+        "yellow_dark": "",
+        "orange_dark": "",
+        "red_dark": "",
+        "purple_dark": "",
+        "blue_dark": "",
+        "sky_dark": "",
+        "lime_dark": "",
+        "pink_dark": "",
+        "black_dark": "",
+        "green_light": "",
+        "yellow_light": "",
+        "orange_light": "",
+        "red_light": "",
+        "purple_light": "",
+        "blue_light": "",
+        "sky_light": "",
+        "lime_light": "",
+        "pink_light": "",
+        "black_light": ""
+    },
+    "organization": {
+        "id": "67d9d5e34d7b900257deed0e",
+        "name": "restassuredjava",
+        "displayName": "REST Assured + JAVA",
+        "memberships": [
+            {
+                "id": "67d9d5e34d7b900257deed14",
+                "idMember": "5ebe94ac959a7d61f6061c0d",
+                "memberType": "admin",
+                "unconfirmed": false,
+                "deactivated": false,
+                "lastActive": "2025-07-20T16:28:00.038Z"
+            }
+        ]
+    }
+}
+"""
+
+P4_EXPECTED_PUT_BOARD_RESPONSE: str = """
+{
+    "id": "688f5105a1fc25568e5b750e",
+    "name": "s",
     "desc": "",
     "descData": null,
     "closed": false,
     "idOrganization": "67d9d5e34d7b900257deed0e",
     "idEnterprise": null,
     "pinned": false,
-    "url": "https://trello.com/b/kubTebpv/hegmann-west-and-rice-board-comgithubjavafakernumber1320e68a",
-    "shortUrl": "https://trello.com/b/kubTebpv",
+    "url": "https://trello.com/b/cjrmYigv/s",
+    "shortUrl": "https://trello.com/b/cjrmYigv",
     "prefs": {
         "permissionLevel": "private",
-        "hideVotes": false,
-        "voting": "disabled",
-        "comments": "members",
-        "invitations": "members",
-        "selfJoin": true,
-        "cardCovers": true,
-        "showCompleteStatus": true,
-        "cardCounts": false,
-        "isTemplate": false,
-        "cardAging": "regular",
-        "calendarFeedEnabled": false,
-        "hiddenPluginBoardButtons": [
-
-        ],
-        "switcherViews": [
-            {
-                "viewType": "Board",
-                "enabled": true
-            },
-            {
-                "viewType": "Table",
-                "enabled": true
-            },
-            {
-                "viewType": "Calendar",
-                "enabled": false
-            },
-            {
-                "viewType": "Dashboard",
-                "enabled": false
-            },
-            {
-                "viewType": "Timeline",
-                "enabled": false
-            },
-            {
-                "viewType": "Map",
-                "enabled": false
-            }
-        ],
-        "autoArchive": null,
-        "background": "blue",
-        "backgroundColor": "#0079BF",
-        "backgroundDarkColor": null,
-        "backgroundImage": null,
-        "backgroundDarkImage": null,
-        "backgroundImageScaled": null,
-        "backgroundTile": false,
-        "backgroundBrightness": "dark",
-        "sharedSourceUrl": null,
-        "backgroundBottomColor": "#0079BF",
-        "backgroundTopColor": "#0079BF",
-        "canBePublic": true,
-        "canBeEnterprise": true,
-        "canBeOrg": true,
-        "canBePrivate": true,
-        "canInvite": true
-    },
-    "labelNames": {
-        "green": "",
-        "yellow": "",
-        "orange": "",
-        "red": "",
-        "purple": "",
-        "blue": "",
-        "sky": "",
-        "lime": "",
-        "pink": "",
-        "black": "",
-        "green_dark": "",
-        "yellow_dark": "",
-        "orange_dark": "",
-        "red_dark": "",
-        "purple_dark": "",
-        "blue_dark": "",
-        "sky_dark": "",
-        "lime_dark": "",
-        "pink_dark": "",
-        "black_dark": "",
-        "green_light": "",
-        "yellow_light": "",
-        "orange_light": "",
-        "red_light": "",
-        "purple_light": "",
-        "blue_light": "",
-        "sky_light": "",
-        "lime_light": "",
-        "pink_light": "",
-        "black_light": ""
-    },
-    "limits": {
-
-    }
-}
-"""
-
-P2_EXPECTED_POST_BOARD_RESPONSE: str = """
-{
-    "id": "686407a52f06c5b579affe98",
-    "name": "Stracke, Mayert and Goyette borad 8886485083800",
-    "desc": "!\\"#$%&\\\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ęĘóÓąĄśŚłŁżŻźŹćĆńŃ",
-    "descData": null,
-    "closed": false,
-    "idOrganization": "67d9d5e34d7b900257deed0e",
-    "idEnterprise": null,
-    "pinned": false,
-    "url": "https://trello.com/b/8khqEHYy/stracke-mayert-and-goyette-borad-8886485083800",
-    "shortUrl": "https://trello.com/b/8khqEHYy",
-    "prefs": {
-        "permissionLevel": "private",
-        "hideVotes": false,
-        "voting": "disabled",
-        "comments": "members",
-        "invitations": "members",
-        "selfJoin": true,
-        "cardCovers": true,
-        "showCompleteStatus": true,
-        "cardCounts": false,
-        "isTemplate": false,
-        "cardAging": "regular",
-        "calendarFeedEnabled": false,
-        "hiddenPluginBoardButtons": [
-
-        ],
-        "switcherViews": [
-            {
-                "viewType": "Board",
-                "enabled": true
-            },
-            {
-                "viewType": "Table",
-                "enabled": true
-            },
-            {
-                "viewType": "Calendar",
-                "enabled": false
-            },
-            {
-                "viewType": "Dashboard",
-                "enabled": false
-            },
-            {
-                "viewType": "Timeline",
-                "enabled": false
-            },
-            {
-                "viewType": "Map",
-                "enabled": false
-            }
-        ],
-        "autoArchive": null,
-        "background": "blue",
-        "backgroundColor": "#0079BF",
-        "backgroundDarkColor": null,
-        "backgroundImage": null,
-        "backgroundDarkImage": null,
-        "backgroundImageScaled": null,
-        "backgroundTile": false,
-        "backgroundBrightness": "dark",
-        "sharedSourceUrl": null,
-        "backgroundBottomColor": "#0079BF",
-        "backgroundTopColor": "#0079BF",
-        "canBePublic": true,
-        "canBeEnterprise": true,
-        "canBeOrg": true,
-        "canBePrivate": true,
-        "canInvite": true
-    },
-    "labelNames": {
-        "green": "",
-        "yellow": "",
-        "orange": "",
-        "red": "",
-        "purple": "",
-        "blue": "",
-        "sky": "",
-        "lime": "",
-        "pink": "",
-        "black": "",
-        "green_dark": "",
-        "yellow_dark": "",
-        "orange_dark": "",
-        "red_dark": "",
-        "purple_dark": "",
-        "blue_dark": "",
-        "sky_dark": "",
-        "lime_dark": "",
-        "pink_dark": "",
-        "black_dark": "",
-        "green_light": "",
-        "yellow_light": "",
-        "orange_light": "",
-        "red_light": "",
-        "purple_light": "",
-        "blue_light": "",
-        "sky_light": "",
-        "lime_light": "",
-        "pink_light": "",
-        "black_light": ""
-    },
-    "limits": {
-
-    }
-}
-"""
-
-P3_EXPECTED_POST_BOARD_RESPONSE: str = """
-{
-    "id": "68641621091053f69a37599c",
-    "name": "Torphy Group borad 12594644267300",
-    "desc": "kf33gFeuFgP25c2Vw0r7edg01w3FqN38L5KBLHkcEZpFuWs0UMbsB2BY2zBAYPixdwcEROp2LNOcRYgLT9qX9RTvFSo1F5RHI724lO46WCWGVgVcCEbc765jCy7Icvr0wk21FQt",
-    "descData": null,
-    "closed": false,
-    "idOrganization": "67d9d5e34d7b900257deed0e",
-    "idEnterprise": null,
-    "pinned": false,
-    "url": "https://trello.com/b/OZUt1r2m/torphy-group-borad-12594644267300",
-    "shortUrl": "https://trello.com/b/OZUt1r2m",
-    "prefs": {
-        "permissionLevel": "org",
         "hideVotes": false,
         "voting": "members",
-        "comments": "observers",
-        "invitations": "admins",
+        "comments": "members",
+        "invitations": "members",
         "selfJoin": false,
         "cardCovers": false,
         "showCompleteStatus": true,
@@ -326,29 +232,41 @@ P3_EXPECTED_POST_BOARD_RESPONSE: str = """
         "pink_light": "",
         "black_light": ""
     },
-    "limits": {
-
+    "organization": {
+        "id": "67d9d5e34d7b900257deed0e",
+        "name": "restassuredjava",
+        "displayName": "REST Assured + JAVA",
+        "memberships": [
+            {
+                "id": "67d9d5e34d7b900257deed14",
+                "idMember": "5ebe94ac959a7d61f6061c0d",
+                "memberType": "admin",
+                "unconfirmed": false,
+                "deactivated": false,
+                "lastActive": "2025-08-03T12:07:35.048Z"
+            }
+        ]
     }
 }
 """
 
-P5_EXPECTED_POST_BOARD_RESPONSE: str = """
+P5_EXPECTED_PUT_BOARD_RESPONSE: str = """
 {
-    "id": "6866d2b38384376342e75b10",
-    "name": "Purdy, Boyer and Reinger borad 14786101123900",
+    "id": "688f579390de24d4fa23467d",
+    "name": "Grimes, Schuppe and Kling borad 20369539356000",
     "desc": "",
     "descData": null,
     "closed": false,
     "idOrganization": "67d9d5e34d7b900257deed0e",
     "idEnterprise": null,
     "pinned": false,
-    "url": "https://trello.com/b/YEGt0s5t/purdy-boyer-and-reinger-borad-14786101123900",
-    "shortUrl": "https://trello.com/b/YEGt0s5t",
+    "url": "https://trello.com/b/Td3RVT5D/grimes-schuppe-and-kling-borad-20369539356000",
+    "shortUrl": "https://trello.com/b/Td3RVT5D",
     "prefs": {
         "permissionLevel": "public",
         "hideVotes": false,
-        "voting": "public",
-        "comments": "org",
+        "voting": "org",
+        "comments": "public",
         "invitations": "members",
         "selfJoin": true,
         "cardCovers": true,
@@ -387,8 +305,8 @@ P5_EXPECTED_POST_BOARD_RESPONSE: str = """
             }
         ],
         "autoArchive": null,
-        "background": "sky",
-        "backgroundColor": "#00AECC",
+        "background": "purple",
+        "backgroundColor": "#89609E",
         "backgroundDarkColor": null,
         "backgroundImage": null,
         "backgroundDarkImage": null,
@@ -396,8 +314,8 @@ P5_EXPECTED_POST_BOARD_RESPONSE: str = """
         "backgroundTile": false,
         "backgroundBrightness": "dark",
         "sharedSourceUrl": null,
-        "backgroundBottomColor": "#00AECC",
-        "backgroundTopColor": "#00AECC",
+        "backgroundBottomColor": "#89609E",
+        "backgroundTopColor": "#89609E",
         "canBePublic": true,
         "canBeEnterprise": true,
         "canBeOrg": true,
@@ -435,24 +353,6 @@ P5_EXPECTED_POST_BOARD_RESPONSE: str = """
         "lime_light": "",
         "pink_light": "",
         "black_light": ""
-    },
-    "limits": {
-
     }
-}
-"""
-
-# ==========================================================================================================
-# NEGATIVE TESTS
-# ==========================================================================================================
-
-# ----
-# name
-# ----
-
-P1_EXPECTED_POST_BOARD_RESPONSE_INVALID_NAME: str = """
-{
-    "message": "invalid value for name",
-    "error": "ERROR"
 }
 """

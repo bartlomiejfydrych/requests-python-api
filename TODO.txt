@@ -3,12 +3,17 @@ PRZEPISANE SEKCJE:
 – dto
 – endpoints
 – enums
-
-SEKCJE DO PRZEPISANIA:
-
 – exceptions
 – expected_responses
 
+SEKCJE DO PRZEPISANIA:
+
+– payloads
+– utils
+– utils_tests
+– tests
+
 LISTA RZECZY DO ZROBIENIA:
 
-–
+– Napisać testy jednostkowe
+– Oddzielić testy jednostkowe od normalnych testów
