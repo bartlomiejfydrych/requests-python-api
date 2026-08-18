@@ -5,10 +5,10 @@ PRZEPISANE SEKCJE:
 – enums
 – exceptions
 – expected_responses
+– payloads
 
 SEKCJE DO PRZEPISANIA:
 
-– payloads
 – utils
 – utils_tests
 – tests
