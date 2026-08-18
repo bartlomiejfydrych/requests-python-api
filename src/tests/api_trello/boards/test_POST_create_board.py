@@ -11,7 +11,7 @@ from expected_responses.boards.POST_create_board_expected import P1_EXPECTED_POS
 from tests.base.test_base import TestBase
 from utils.response.utils_response_deserializer import deserialize_and_validate_json
 from utils.utils_compare import compare_objects
-from utils_tests.POST_create_board_utils import prepare_expected_response_post, validate_get_against_post
+from utils_tests.boards.POST_create_board_utils import prepare_expected_response_post, validate_get_against_post
 
 
 class TestPostCreateBoard(TestBase):

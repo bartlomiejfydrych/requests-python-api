@@ -7,10 +7,10 @@ PRZEPISANE SEKCJE:
 – expected_responses
 – payloads
 – utils
+– utils_tests
 
 SEKCJE DO PRZEPISANIA:
 
-– utils_tests
 – tests
 
 LISTA RZECZY DO ZROBIENIA:
