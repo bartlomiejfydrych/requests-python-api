@@ -1,7 +1,7 @@
-import random as random_module
 from typing import Optional
 
-from faker import Faker
+from providers.provider_random import faker as provider_faker
+from providers.provider_random import random as provider_random
 
 from configuration.requests_session.base_request_spec import BaseRequestSpec
 from configuration.requests_session.config_request_spec import (
@@ -30,8 +30,10 @@ class TestBase:
     # HELPERS
     # -------
 
-    faker = Faker()  # Obiekt Faker do generowania losowych danych testowych
-    random = random_module.Random()  # Obiekt Random używany do wybierania losowego elementu
+    # NOTE FOR ME: Wywołanie *funkcji* z providera przy tworzeniu klasy (a nie samo przypisanie funkcji) —
+    # zwracają one te same, zseedowane singletony co reszta frameworka (spójność z UtilsRandom itd.).
+    faker = provider_faker()  # Obiekt Faker do generowania losowych danych testowych (zseedowany)
+    random = provider_random()  # Obiekt Random używany do wybierania losowego elementu (zseedowany)
 
     # ==========================================================================================================
     # SET UP

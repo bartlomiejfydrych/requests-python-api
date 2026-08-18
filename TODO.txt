@@ -6,10 +6,10 @@ PRZEPISANE SEKCJE:
 – exceptions
 – expected_responses
 – payloads
+– utils
 
 SEKCJE DO PRZEPISANIA:
 
-– utils
 – utils_tests
 – tests
 
