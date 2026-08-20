@@ -1,11 +1,12 @@
 from dto.emoji.GET_list_available_emoji_dto import GetListAvailableEmojiDto
-from utils.utils_resources import read_json_file_as_object
+from utils.response.utils_response_deserializer import deserialize_and_validate_json
+from utils.utils_file import read_expected_response_file_as_string
 
 # ==========================================================================================================
 # FIELDS
 # ==========================================================================================================
 
-BASE_PATH = "tests/expected_responses/emoji/GET_ListAvailableEmojiExpected/"
+BASE_PATH = "emoji/GET_list_available_emoji/"
 
 
 # ==========================================================================================================
@@ -13,7 +14,5 @@ BASE_PATH = "tests/expected_responses/emoji/GET_ListAvailableEmojiExpected/"
 # ==========================================================================================================
 
 def get_expected_response_dto(file_name: str) -> GetListAvailableEmojiDto:
-    return read_json_file_as_object(
-        BASE_PATH + file_name,
-        GetListAvailableEmojiDto
-    )
+    json_string: str = read_expected_response_file_as_string(BASE_PATH + file_name)
+    return deserialize_and_validate_json(json_string, GetListAvailableEmojiDto)
