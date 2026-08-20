@@ -41,7 +41,7 @@ WAŻNA RÓŻNICA w wersjach "soft":
 import copy
 import json
 import re
-from typing import Any, List, Tuple
+from typing import Any, Callable, List, Tuple
 from dataclasses import asdict, is_dataclass
 
 from deepdiff import DeepDiff
@@ -88,6 +88,38 @@ def compare_objects_soft(
     softly.check(
         not diff,
         f"Objects are different (ignored fields: {fields_to_ignore}):\n{diff.pretty() if diff else ''}",
+    )
+
+
+# EXAMPLE OF USE:
+# assert_satisfies_any_of(
+#     actual_object,
+#     lambda obj: compare_objects(obj, expected_variant_a),
+#     lambda obj: compare_objects(obj, expected_variant_b),
+# )
+
+def assert_satisfies_any_of(actual_object: Any, *conditions: "Callable[[Any], None]") -> None:
+    """
+    NOTES FOR ME:
+    Odpowiednik AssertJ's:
+        assertThat(actualObject).satisfiesAnyOf(condition1, condition2, ...);
+
+    Przechodzi, jeśli PRZYNAJMNIEJ JEDEN z warunków (funkcji przyjmujących `actual_object`
+    i rzucających AssertionError w razie niezgodności - np. lambda z compare_objects w środku)
+    zakończy się bez wyjątku. Jeśli WSZYSTKIE warunki zawiodą, zgłasza jeden AssertionError
+    zbierający komunikaty ze wszystkich prób.
+    """
+    errors: list[str] = []
+
+    for condition in conditions:
+        try:
+            condition(actual_object)
+            return
+        except AssertionError as e:
+            errors.append(str(e))
+
+    raise AssertionError(
+        "None of the conditions were satisfied:\n" + "\n---\n".join(errors)
     )
 
 
