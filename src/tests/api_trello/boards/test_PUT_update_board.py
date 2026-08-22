@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -45,10 +46,10 @@ class TestPutUpdateBoard(TestBase):
 
     trello_id: str = get_trello_id()
     # BOARD (POST) – changing variables
-    board_id: Optional[str] = None
-    board_name: Optional[str] = None
-    board_url: Optional[AnyUrl] = None
-    board_short_url: Optional[AnyUrl] = None
+    board_id: str
+    board_name: str
+    board_url: AnyUrl
+    board_short_url: AnyUrl
 
     # ==========================================================================================================
     # SETUP & TEARDOWN
@@ -60,7 +61,7 @@ class TestPutUpdateBoard(TestBase):
     # not on `self` - otherwise the next test method wouldn't see it.
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup_create_board(self, request) -> None:
+    def setup_create_board(self, request) -> Generator[None, None, None]:
         # ----------
         # BEFORE ALL
         # ----------
@@ -80,7 +81,6 @@ class TestPutUpdateBoard(TestBase):
         if request.cls.board_id is not None:
             response_delete: Response = delete_delete_board(request.cls.board_id)
             assert response_delete.status_code == 200
-            request.cls.board_id = None
 
     # ==========================================================================================================
     # DEBUG
@@ -131,6 +131,7 @@ class TestPutUpdateBoard(TestBase):
         try:
             response_post_dto: POST_CreateBoardDto = deserialize_and_validate_json(response_post, POST_CreateBoardDto)
             board_id = response_post_dto.id
+            assert board_id is not None  # Assertion for type checker
             post_board_url: AnyUrl = response_post_dto.url
             post_board_short_url: AnyUrl = response_post_dto.short_url
             # PUT
@@ -146,6 +147,8 @@ class TestPutUpdateBoard(TestBase):
             )
             expected_response_put_dto.desc = desc
             expected_response_put_dto.id_organization = self.trello_id
+            assert expected_response_put_dto.organization is not None  # Assertion for type checker
+            assert response_put_dto.organization is not None  # Assertion for type checker
             expected_response_put_dto.organization.memberships[0].last_active = (
                 response_put_dto.organization.memberships[0].last_active
             )
@@ -157,7 +160,6 @@ class TestPutUpdateBoard(TestBase):
             if board_id is not None:
                 response_delete: Response = delete_delete_board(board_id)
                 assert response_delete.status_code == 200
-                board_id = None
 
     def test_p3_should_update_board_when_all_parameters_are_missing(self) -> None:
         # GET (Get current status of {BOARD})
@@ -204,6 +206,8 @@ class TestPutUpdateBoard(TestBase):
         expected_response_put_dto: PUT_UpdateBoardDto = prepare_expected_response_put(
             P4_EXPECTED_PUT_BOARD_RESPONSE, self.board_id, board_name, response_put_dto.url, self.board_short_url
         )
+        assert expected_response_put_dto.organization is not None  # Assertion for type checker
+        assert response_put_dto.organization is not None  # Assertion for type checker
         expected_response_put_dto.organization.memberships[0].last_active = (
             response_put_dto.organization.memberships[0].last_active
         )
