@@ -8,10 +8,11 @@ PRZEPISANE SEKCJE:
 – payloads
 – utils
 – utils_tests
+– tests
 
 SEKCJE DO PRZEPISANIA:
 
-– tests
+– testy jednostkowe
 
 LISTA RZECZY DO ZROBIENIA:
 
