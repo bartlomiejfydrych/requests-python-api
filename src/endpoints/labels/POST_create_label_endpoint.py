@@ -7,7 +7,7 @@ from endpoints.base_endpoint import get_specification
 from endpoints.labels.labels_base_endpoint import ENDPOINT_LABELS
 
 from enums.query_parameters.labels.label_base_query_parameters import LabelBaseQueryParameters
-from enums.query_parameters.labels.post_create_label_query_parameters import PostCreateLabelQueryParameters
+from enums.query_parameters.labels.POST_create_label_query_parameters import PostCreateLabelQueryParameters
 from enums.query_parameters_values.interfaces.query_param_value import QueryParamValue
 
 from payloads.labels.POST_create_label_payload import PostCreateLabelPayload

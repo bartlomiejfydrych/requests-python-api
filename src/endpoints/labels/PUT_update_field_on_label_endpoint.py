@@ -7,7 +7,7 @@ from endpoints.base_endpoint import get_specification
 from endpoints.labels.labels_base_endpoint import label_by_id
 
 from enums.query_parameters.labels.label_base_query_parameters import LabelBaseQueryParameters
-from enums.query_parameters.labels.put_update_field_on_label_query_parameters import (
+from enums.query_parameters.labels.PUT_update_field_on_label_query_parameters import (
     PutUpdateFieldOnLabelQueryParameters,
 )
 
