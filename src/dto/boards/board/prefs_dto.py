@@ -52,7 +52,7 @@ class PrefsDto(BaseDto):
 
     permission_level: str = Field(pattern=r"^(org|private|public)$")
     hide_votes: bool
-    voting: str = Field(pattern=r"^(org|private|public|disabled)$")
+    voting: str = Field(pattern=r"^(disabled|members|observers|org|public)$")
     comments: str = Field(pattern=r"^(disabled|members|observers|org|public)$")
     invitations: str = Field(pattern=r"^(members|admins)$")
 
@@ -101,6 +101,7 @@ class PrefsDto(BaseDto):
     can_be_org: bool
     can_be_private: bool
     can_invite: bool
+
 
 '''
 Rzeczy, na które chcę zwrócić uwagę

@@ -1,5 +1,7 @@
 from typing import ClassVar
 
+from pydantic import Field
+
 from dto.base_dto import BaseDto
 
 
@@ -17,10 +19,14 @@ class SkinVariationEntryDto(BaseDto):
     # FIELDS – VALIDATION CONSTRAINTS
     # ==========================================================================================================
 
-    unified: str | None
+    # NOTE FOR ME:
+    # Java (SkinVariationEntry.java) - żadne pole nie ma @NotNull ani nie jest częścią @JsonCreator, więc
+    # wszystkie są w pełni opcjonalne (klucz może w ogóle nie wystąpić) -> jawne "= None" dla każdego pola.
+    unified: str | None = None
 
-    native_char: str | None
+    # Klucz JSON to "native" (nie "nativeChar") - alias trzeba nadpisać ręcznie, tak jak w TrelloDto.
+    native_char: str | None = Field(default=None, alias=FIELD_NATIVE)
 
-    sheet_x: int | None
+    sheet_x: int | None = None
 
-    sheet_y: int | None
+    sheet_y: int | None = None

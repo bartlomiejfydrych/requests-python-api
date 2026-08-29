@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -37,17 +38,17 @@ class TestPutUpdateFieldOnLabel(TestBase):
     # BOARD
     board_id: Optional[str] = None
     # LABEL
-    label_id: Optional[str] = None
+    label_id: str
     # NOTE: The label object created below acts as our "expected response" - we mutate its fields in place
     # as each positive test changes something on the real label.
-    expected_label_dto: Optional[PostCreateLabelDto] = None
+    expected_label_dto: PostCreateLabelDto
 
     # ==========================================================================================================
     # SETUP & TEARDOWN
     # ==========================================================================================================
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup_create_board_and_label(self, request) -> None:
+    def setup_create_board_and_label(self, request) -> Generator[None, None, None]:
         # ----------
         # BEFORE ALL
         # ----------
@@ -74,16 +75,6 @@ class TestPutUpdateFieldOnLabel(TestBase):
             assert response_delete.status_code == 200
             request.cls.board_id = None
             request.cls.label_id = None
-
-    # ==========================================================================================================
-    # DEBUG
-    # ==========================================================================================================
-
-    # To run it, add the word "test" before the '_' character at the beginning of the method name
-    def _debug_delete_board(self) -> None:
-        your_board_id: str = "68724f5bfffa6577a4dc0dbb"
-        response_delete: Response = delete_delete_board(your_board_id)
-        assert response_delete.status_code == 200
 
     # ==========================================================================================================
     # POSITIVE TESTS

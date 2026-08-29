@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -43,12 +44,12 @@ class TestPutUpdateList(TestBase):
     # ---------------
 
     # BOARD
-    board_id: Optional[str] = None
+    board_id: str
     # LIST – COMMON
-    list_id: Optional[str] = None
+    list_id: str
     # LIST – POST | Some variables are intentionally taken from POST into the expected response, to check
     # whether PUT accidentally changed them when it wasn't supposed to.
-    response_post_dto: Optional[PostCreateNewListDto] = None
+    response_post_dto: PostCreateNewListDto
 
     # NOTE FOR ME: Java also declares `listName`/`listClosed`/`listPosAsLong`/`listPosAsString`/
     # `listSubscribed`/`boardIdN` as class fields, but (same as in the labels/board-list tests) no test ever
@@ -59,10 +60,12 @@ class TestPutUpdateList(TestBase):
     # ==========================================================================================================
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup_create_board_and_list(self, request) -> None:
+    def setup_create_board_and_list(self, request) -> Generator[None, None, None]:
+
         # ----------
         # BEFORE ALL
         # ----------
+
         # BOARD
         response_post: Response = post_create_board(generate_random_board_name(), None)
         assert response_post.status_code == 200
@@ -79,21 +82,11 @@ class TestPutUpdateList(TestBase):
         # ---------
         # AFTER ALL
         # ---------
-        if request.cls.board_id is not None:
-            response_delete: Response = delete_delete_board(request.cls.board_id)
-            assert response_delete.status_code == 200
-            request.cls.board_id = None
-            request.cls.list_id = None
 
-    # ==========================================================================================================
-    # DEBUG
-    # ==========================================================================================================
-
-    # To run it, add the word "test" before the '_' character at the beginning of the method name
-    def _debug_delete_board(self) -> None:
-        your_board_id: str = "68724f5bfffa6577a4dc0dbb"
-        response_delete: Response = delete_delete_board(your_board_id)
+        response_delete: Response = delete_delete_board(request.cls.board_id)
         assert response_delete.status_code == 200
+        request.cls.board_id = None
+        request.cls.list_id = None
 
     # ==========================================================================================================
     # POSITIVE TESTS
@@ -451,17 +444,17 @@ class TestPutUpdateList(TestBase):
     # --
 
     @pytest.mark.parametrize(
-        "test_id, test_description, id",
+        "test_id, test_description, list_id",
         [
             pytest.param("N1", "should_not_update_list_when_id_non_existent", "99", id="N1"),
             pytest.param("N2", "should_not_update_list_when_id_incorrect", "KeK", id="N2"),
         ],
     )
     def test_should_not_update_list_with_invalid_id(
-            self, test_id: str, test_description: str, id: str
+            self, test_id: str, test_description: str, list_id: str
     ) -> None:
         # ACT
-        response_put: Response = put_update_list(id, None)
+        response_put: Response = put_update_list(list_id, None)
         # ASSERT
         assert response_put.status_code == 400
         assert response_put.text == EXPECTED_PUT_UPDATE_LIST_RESPONSE_INVALID_ID

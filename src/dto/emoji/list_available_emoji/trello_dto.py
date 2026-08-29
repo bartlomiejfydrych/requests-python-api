@@ -36,8 +36,10 @@ class TrelloDto(BaseDto):
     name: str
 
     # NOTE FOR ME:
-    # UWAGA: "native" jest słowem kluczowym w Pythonie tylko jako część CPython API
-    native_char: str
+    # UWAGA: "native" jest słowem kluczowym w Pythonie tylko jako część CPython API.
+    # Klucz JSON to "native" (nie "nativeChar"), więc alias_generator=to_camel wygenerowałby zły alias
+    # ("nativeChar") - trzeba go nadpisać ręcznie, tak jak Java robi to przez @JsonProperty("native").
+    native_char: str = Field(alias=FIELD_NATIVE)
 
     short_name: str
 
@@ -45,7 +47,11 @@ class TrelloDto(BaseDto):
 
     text: str | None
 
-    texts: list[str] | None
+    # NOTE FOR ME:
+    # Java: brak @NotNull i pole nie jest częścią @JsonCreator (required=true) -> klucz może w ogóle
+    # nie wystąpić w JSON-ie (Jackson zostawia null). W Pydantic samo "X | None" (bez "= None") nadal
+    # wymaga OBECNOŚCI klucza - stąd jawny domyślny None dla wiernego odwzorowania.
+    texts: list[str] | None = None
 
     category: str
 
@@ -55,8 +61,8 @@ class TrelloDto(BaseDto):
 
     skin_variation: str | None
 
-    skin_variations: SkinVariationsDto | None
+    skin_variations: SkinVariationsDto | None = None
 
-    tts: str | None
+    tts: str | None = None
 
-    keywords: list[str] | None
+    keywords: list[str] | None = None

@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -36,7 +37,7 @@ class TestPostCreateNewList(TestBase):
     # ---------------
 
     # BOARD
-    board_id: Optional[str] = None
+    board_id: str
 
     # NOTE FOR ME: Java also declares `listName`/`listIdListSource`/`listPos` as class fields, but (same as
     # in the labels tests) no test ever reads a value set by a previous test - kept as plain locals here.
@@ -46,7 +47,7 @@ class TestPostCreateNewList(TestBase):
     # ==========================================================================================================
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup_create_board(self, request) -> None:
+    def setup_create_board(self, request) -> Generator[None, None, None]:
         # ----------
         # BEFORE ALL
         # ----------
@@ -59,20 +60,10 @@ class TestPostCreateNewList(TestBase):
         # ---------
         # AFTER ALL
         # ---------
-        if request.cls.board_id is not None:
-            response_delete: Response = delete_delete_board(request.cls.board_id)
-            assert response_delete.status_code == 200
-            request.cls.board_id = None
 
-    # ==========================================================================================================
-    # DEBUG
-    # ==========================================================================================================
-
-    # To run it, add the word "test" before the '_' character at the beginning of the method name
-    def _debug_delete_board(self) -> None:
-        your_board_id: str = "68724f5bfffa6577a4dc0dbb"
-        response_delete: Response = delete_delete_board(your_board_id)
+        response_delete: Response = delete_delete_board(request.cls.board_id)
         assert response_delete.status_code == 200
+        request.cls.board_id = None
 
     # ==========================================================================================================
     # POSITIVE TESTS

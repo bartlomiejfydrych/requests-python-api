@@ -17,5 +17,5 @@ class GetListAvailableEmojiDto(BaseDto):
     # FIELDS – VALIDATION CONSTRAINTS
     # ==========================================================================================================
 
-    sprite_sheets: SpriteSheetsDto | None
+    sprite_sheets: SpriteSheetsDto | None = None
     trello: list[TrelloDto]

@@ -9,12 +9,10 @@ PRZEPISANE SEKCJE:
 – utils
 – utils_tests
 – tests
+– testy jednostkowe
 
 SEKCJE DO PRZEPISANIA:
 
-– testy jednostkowe
-
 LISTA RZECZY DO ZROBIENIA:
 
-– Napisać testy jednostkowe
 – Oddzielić testy jednostkowe od normalnych testów

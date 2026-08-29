@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -23,7 +24,7 @@ class TestDelDeleteLabel(TestBase):
     # ---------------
 
     # BOARD
-    board_id: Optional[str] = None
+    board_id: str
 
     # ==========================================================================================================
     # SETUP & TEARDOWN
@@ -34,7 +35,7 @@ class TestDelDeleteLabel(TestBase):
     # scope is already "function", so a plain (non-class-scoped) autouse fixture matches this 1:1.
 
     @pytest.fixture(autouse=True)
-    def setup_and_teardown_board(self):
+    def setup_and_teardown_board(self) -> Generator[None, None, None]:
         # -----------
         # BEFORE EACH
         # -----------
@@ -49,10 +50,8 @@ class TestDelDeleteLabel(TestBase):
         # AFTER EACH
         # ----------
 
-        if self.board_id is not None:
-            response_delete: Response = delete_delete_board(self.board_id)
-            assert response_delete.status_code == 200
-            self.board_id = None
+        response_delete: Response = delete_delete_board(self.board_id)
+        assert response_delete.status_code == 200
 
     # ==========================================================================================================
     # POSITIVE TESTS

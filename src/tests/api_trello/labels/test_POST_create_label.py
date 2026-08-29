@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Optional
 
 import pytest
@@ -33,7 +34,7 @@ class TestPostCreateLabel(TestBase):
     # ---------------
 
     # BOARD
-    board_id: Optional[str] = None
+    board_id: str
 
     # NOTE FOR ME: Java also declares `labelName`/`labelColor` as class fields, but no test ever reads a value
     # set by a previous test - each test sets and consumes them within its own body. So unlike `board_id`
@@ -44,10 +45,11 @@ class TestPostCreateLabel(TestBase):
     # ==========================================================================================================
 
     @pytest.fixture(scope="class", autouse=True)
-    def setup_create_board(self, request) -> None:
+    def setup_create_board(self, request) -> Generator[None, None, None]:
         # ----------
         # BEFORE ALL
         # ----------
+
         response_post: Response = post_create_board(generate_random_board_name(), None)
         assert response_post.status_code == 200
         request.cls.board_id = response_post.json()["id"]
@@ -57,19 +59,8 @@ class TestPostCreateLabel(TestBase):
         # ---------
         # AFTER ALL
         # ---------
-        if request.cls.board_id is not None:
-            response_delete: Response = delete_delete_board(request.cls.board_id)
-            assert response_delete.status_code == 200
-            request.cls.board_id = None
 
-    # ==========================================================================================================
-    # DEBUG
-    # ==========================================================================================================
-
-    # To run it, add the word "test" before the '_' character at the beginning of the method name
-    def _debug_delete_board(self) -> None:
-        your_board_id: str = "68724f5bfffa6577a4dc0dbb"
-        response_delete: Response = delete_delete_board(your_board_id)
+        response_delete: Response = delete_delete_board(request.cls.board_id)
         assert response_delete.status_code == 200
 
     # ==========================================================================================================
@@ -83,7 +74,7 @@ class TestPostCreateLabel(TestBase):
         label_color: Color = pick_random_enum(Color)
 
         # POST
-        response_post: Response = post_create_label(self.board_id, label_name, label_color)
+        response_post: Response = post_create_label(self.board_id, label_name, label_color.value)
         assert response_post.status_code == 200
         response_post_dto: PostCreateLabelDto = deserialize_and_validate_json(response_post, PostCreateLabelDto)
         expected_response_post_dto: PostCreateLabelDto = (
@@ -100,7 +91,7 @@ class TestPostCreateLabel(TestBase):
 
     def test_p2_should_create_label_when_name_have_one_character_and_color_is_null(self) -> None:
         label_name: str = get_random_single_char_alphanumeric()
-        label_color: Optional[Color] = None
+        label_color: Optional[str] = None
 
         # POST
         response_post: Response = post_create_label(self.board_id, label_name, label_color)
@@ -125,7 +116,7 @@ class TestPostCreateLabel(TestBase):
         label_color: Color = Color.PURPLE
 
         # POST
-        response_post: Response = post_create_label(self.board_id, label_name, label_color)
+        response_post: Response = post_create_label(self.board_id, label_name, label_color.value)
         assert response_post.status_code == 200
         response_post_dto: PostCreateLabelDto = deserialize_and_validate_json(response_post, PostCreateLabelDto)
         expected_response_post_dto: PostCreateLabelDto = (
@@ -218,10 +209,13 @@ class TestPostCreateLabel(TestBase):
         ],
     )
     def test_should_not_create_label_with_invalid_board_id(
-            self, test_id: str, test_description: str, board_id: Optional[str]
+            self,
+            test_id: str,
+            test_description: str,
+            board_id: Optional[str]
     ) -> None:
         # ACT
-        response_post: Response = post_create_label(board_id, f"{test_id} Label Name", Color.PURPLE)
+        response_post: Response = post_create_label(board_id, f"{test_id} Label Name", Color.PURPLE.value)
         # ASSERT
         assert response_post.status_code == 400
         compare_response_with_json(response_post, EXPECTED_POST_LABEL_RESPONSE_INVALID_ID)

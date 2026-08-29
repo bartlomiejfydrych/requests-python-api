@@ -103,7 +103,6 @@ class TestPutUpdateBoard(TestBase):
         board_id: Optional[str] = None
         # PUT
         board_name: str = get_all_characters_set_in_random_order()
-        self.__class__.board_name = board_name
         desc: str = get_all_characters_set_in_random_order()
 
         payload: PutUpdateBoardPayload = PutUpdateBoardPayload(
@@ -177,8 +176,10 @@ class TestPutUpdateBoard(TestBase):
         validate_get_against_put(response_put_dto)
 
     def test_p4_should_update_board_when_name_have_only_one_character_and_booleans_are_false(self) -> None:
+        # POST
+        board_id: Optional[str] = None
+        # PUT
         board_name: str = get_random_single_char_alphanumeric()
-        self.__class__.board_name = board_name
 
         payload: PutUpdateBoardPayload = PutUpdateBoardPayload(
             name=board_name,
@@ -195,25 +196,40 @@ class TestPutUpdateBoard(TestBase):
             prefs_calendar_feed_enabled=False,
         )
 
-        # PUT
-        response_put: Response = put_update_board(self.board_id, payload)
-        assert response_put.status_code == 200
-        response_put_dto: PUT_UpdateBoardDto = deserialize_and_validate_json(response_put, PUT_UpdateBoardDto)
-        assert response_put_dto.url != self.board_url
-        assert strip_board_name_from_url(str(response_put_dto.url)) == strip_board_name_from_url(
-            str(self.board_url)
-        )
-        expected_response_put_dto: PUT_UpdateBoardDto = prepare_expected_response_put(
-            P4_EXPECTED_PUT_BOARD_RESPONSE, self.board_id, board_name, response_put_dto.url, self.board_short_url
-        )
-        assert expected_response_put_dto.organization is not None  # Assertion for type checker
-        assert response_put_dto.organization is not None  # Assertion for type checker
-        expected_response_put_dto.organization.memberships[0].last_active = (
-            response_put_dto.organization.memberships[0].last_active
-        )
-        compare_objects(response_put_dto, expected_response_put_dto)
-        # GET
-        validate_get_against_put(response_put_dto)
+        # POST (We need to create a separate, independent board because this test permanently changes
+        # name/selfJoin/cardCovers/cardAging, which would break the shared-board assumptions of other tests.)
+        response_post: Response = post_create_board(generate_random_board_name(), None)
+        assert response_post.status_code == 200
+        try:
+            response_post_dto: POST_CreateBoardDto = deserialize_and_validate_json(response_post, POST_CreateBoardDto)
+            board_id = response_post_dto.id
+            assert board_id is not None  # Assertion for type checker
+            post_board_url: AnyUrl = response_post_dto.url
+            post_board_short_url: AnyUrl = response_post_dto.short_url
+            # PUT
+            response_put: Response = put_update_board(board_id, payload)
+            assert response_put.status_code == 200
+            response_put_dto: PUT_UpdateBoardDto = deserialize_and_validate_json(response_put, PUT_UpdateBoardDto)
+            assert response_put_dto.url != post_board_url
+            assert strip_board_name_from_url(str(response_put_dto.url)) == strip_board_name_from_url(
+                str(post_board_url)
+            )
+            expected_response_put_dto: PUT_UpdateBoardDto = prepare_expected_response_put(
+                P4_EXPECTED_PUT_BOARD_RESPONSE, board_id, board_name, response_put_dto.url, post_board_short_url
+            )
+            assert expected_response_put_dto.organization is not None  # Assertion for type checker
+            assert response_put_dto.organization is not None  # Assertion for type checker
+            expected_response_put_dto.organization.memberships[0].last_active = (
+                response_put_dto.organization.memberships[0].last_active
+            )
+            compare_objects(response_put_dto, expected_response_put_dto)
+            # GET
+            validate_get_against_put(response_put_dto)
+        finally:
+            # DELETE
+            if board_id is not None:
+                response_delete: Response = delete_delete_board(board_id)
+                assert response_delete.status_code == 200
 
     def test_p5_should_update_board_when_remaining_parameters_are_provided_randomly(self) -> None:
         prefs_voting: str = pick_random("org", "public")

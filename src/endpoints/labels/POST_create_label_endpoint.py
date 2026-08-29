@@ -22,15 +22,15 @@ from payloads.labels.POST_create_label_payload import PostCreateLabelPayload
 # --------------------------
 
 def create_label(
-        board_id: str,
+        board_id: str | None,
         label_name: str,
-        label_color: Optional[str],
+        label_color: str | None,
         spec: BaseRequestSpec,
 ) -> Response:
     query_params = {
-        LabelBaseQueryParameters.ID_BOARD.value: board_id,
+        PostCreateLabelQueryParameters.ID_BOARD.value: board_id,
         LabelBaseQueryParameters.NAME.value: label_name,
-        PostCreateLabelQueryParameters.COLOR.value: label_color,
+        LabelBaseQueryParameters.COLOR.value: label_color,
     }
 
     return spec.post(
@@ -40,9 +40,9 @@ def create_label(
 
 
 def post_create_label(
-        board_id: str,
+        board_id: str | None,
         label_name: str,
-        label_color: Optional[str | QueryParamValue],
+        label_color: str | QueryParamValue | None,
 ) -> Response:
     color_value = (
         label_color.value
