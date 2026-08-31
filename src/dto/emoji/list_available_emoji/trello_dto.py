@@ -33,7 +33,7 @@ class TrelloDto(BaseDto):
 
     unified: str = Field(pattern=r"^[0-9A-Fa-f]{4,6}(?:-[0-9A-Fa-f]{4,6})*$")
 
-    name: str
+    name: str | None
 
     # NOTE FOR ME:
     # UWAGA: "native" jest słowem kluczowym w Pythonie tylko jako część CPython API.

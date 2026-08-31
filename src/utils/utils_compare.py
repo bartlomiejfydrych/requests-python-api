@@ -178,10 +178,36 @@ def _normalize_for_comparison(obj: Any) -> Any:
 
 
 def _recursive_diff(actual: Any, expected: Any, fields_to_ignore: Tuple[str, ...]) -> DeepDiff:
+    """
+    NOTES:
+    AssertJ's usingRecursiveComparison() drives the comparison from `actual`'s
+    fields: if `expected` has an extra field that doesn't exist on `actual`
+    (e.g. comparing a PUT_UpdateFieldOnLabelDto, which has no "limits" field,
+    against a POST_CreateLabelDto reused as the "expected" object, which does
+    have "limits"), AssertJ simply ignores it - it never gets introspected.
+
+    DeepDiff, by contrast, does a fully symmetric comparison and would flag
+    that as "dictionary_item_removed". To keep the same semantics as the
+    original Java assertions, we exclude those paths (fields present only on
+    the expected side, missing entirely on actual) from the comparison
+    entirely - via a first "probe" diff that finds them, then a real diff
+    that excludes them, so both the pass/fail result AND the pretty-printed
+    message stay accurate. Fields present only on actual (missing on
+    expected) are still reported, since AssertJ would fail to find a matching
+    field on expected in that case too.
+    """
+    actual_norm = _normalize_for_comparison(actual)
+    expected_norm = _normalize_for_comparison(expected)
+    exclude_regex = _exclude_regex_paths(fields_to_ignore)
+
+    probe = DeepDiff(expected_norm, actual_norm, exclude_regex_paths=exclude_regex)
+    expected_only_paths = list(probe.get("dictionary_item_removed", []))
+
     return DeepDiff(
-        _normalize_for_comparison(expected),
-        _normalize_for_comparison(actual),
-        exclude_regex_paths=_exclude_regex_paths(fields_to_ignore),
+        expected_norm,
+        actual_norm,
+        exclude_regex_paths=exclude_regex,
+        exclude_paths=expected_only_paths,
     )
 
 
