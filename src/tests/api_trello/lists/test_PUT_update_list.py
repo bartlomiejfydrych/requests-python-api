@@ -215,7 +215,16 @@ class TestPutUpdateList(TestBase):
         # PUT
         list_pos_2: str = "top"
         list_pos_3: str = "bottom"
-        list_pos_4: int = 140737488322560
+
+        # NOTE FOR ME:
+        # Java hardcodes listPos4 = 140737488322560L, assuming it will always be lower than the base
+        # list's (self.response_post_dto) auto-assigned pos. Trello assigns a default pos near 2^47
+        # (140737488355328) with a small random jitter, so that assumption is flaky by design - the
+        # hardcoded constant sometimes ends up HIGHER than self.response_post_dto.pos, making the
+        # "numeric pos should be before list 1" assertion fail at random. Fixed here by deriving
+        # list_pos_4 from the actually observed self.response_post_dto.pos, guaranteeing it is always
+        # lower, regardless of Trello's jitter.
+        list_pos_4: int = self.response_post_dto.pos - 50000
 
         payload_2: PutUpdateListPayload = PutUpdateListPayload(pos=list_pos_2)
         payload_3: PutUpdateListPayload = PutUpdateListPayload(pos=list_pos_3)

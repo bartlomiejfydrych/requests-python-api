@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.payloads.base_payload import BasePayload
-from src.enums.query_parameters.lists.lists.list_base_query_parameters import \
+from payloads.base_payload import BasePayload
+from enums.query_parameters.lists.lists.list_base_query_parameters import \
     ListBaseQueryParameters as Base
-from src.enums.query_parameters.lists.lists.PUT_update_list_query_parameters import \
+from enums.query_parameters.lists.lists.PUT_update_list_query_parameters import \
     PutUpdateListQueryParameters as Put
 
 
@@ -30,7 +30,7 @@ class PutUpdateListPayload(BasePayload):
         self.put_if_not_null(params, Base.NAME, self.name)
         self.put_if_not_null(params, Put.CLOSED, self.closed)
         self.put_if_not_null(params, Base.ID_BOARD, self.id_board)
-        self.put_if_not_null(params, Put.POS, self.pos)
+        self.put_if_not_null(params, Base.POS, self.pos)
         self.put_if_not_null(params, Put.SUBSCRIBED, self.subscribed)
 
         return params

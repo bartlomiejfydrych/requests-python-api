@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.payloads.base_payload import BasePayload
-from src.enums.query_parameters.emoji.GET_list_available_emoji_query_parameters import \
+from payloads.base_payload import BasePayload
+from enums.query_parameters.emoji.GET_list_available_emoji_query_parameters import \
     GetListAvailableEmojiQueryParameters as Get
 
 

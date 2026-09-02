@@ -157,11 +157,9 @@ class TestPostCreateNewList(TestBase):
         list_name_4: str = generate_random_list_name()
         list_pos_2: str = "top"
         list_pos_3: str = "bottom"
-        list_pos_4: int = 140737488322560
 
         payload_2: PostCreateNewListPayload = PostCreateNewListPayload(pos=list_pos_2)
         payload_3: PostCreateNewListPayload = PostCreateNewListPayload(pos=list_pos_3)
-        payload_4: PostCreateNewListPayload = PostCreateNewListPayload(pos=list_pos_4)
 
         # ---
         # ACT
@@ -174,6 +172,18 @@ class TestPostCreateNewList(TestBase):
             response_post_1, PostCreateNewListDto
         )
         response_post_pos_1: int = response_post_dto_1.pos
+
+        # NOTE FOR ME:
+        # Java (POST_CreateNewListTest.java) hardcodes listPos4 = 140737488322560L, assuming it will
+        # always be lower than the first list's auto-assigned pos. Trello assigns a default pos near 2^47
+        # (140737488355328) with a small random jitter for lists created without an explicit "pos", so
+        # that assumption is flaky by design - the hardcoded constant sometimes ends up HIGHER than
+        # response_post_pos_1, making the "numeric pos should be before list 1" assertion fail at random.
+        # Fixed here by deriving list_pos_4 from the actually observed response_post_pos_1, guaranteeing
+        # it is always lower, regardless of Trello's jitter.
+        list_pos_4: int = response_post_pos_1 - 50000
+
+        payload_4: PostCreateNewListPayload = PostCreateNewListPayload(pos=list_pos_4)
 
         # POST (Add {LIST 2})
         response_post_2: Response = post_create_new_list(self.board_id, list_name_2, payload_2)

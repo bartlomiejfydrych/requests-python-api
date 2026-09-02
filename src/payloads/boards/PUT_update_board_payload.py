@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.payloads.base_payload import BasePayload
-from src.enums.query_parameters.boards.boards.board_base_query_parameters import BoardBaseQueryParameters as Base
-from src.enums.query_parameters.boards.boards.PUT_update_board_query_parameters import \
+from payloads.base_payload import BasePayload
+from enums.query_parameters.boards.boards.board_base_query_parameters import BoardBaseQueryParameters as Base
+from enums.query_parameters.boards.boards.PUT_update_board_query_parameters import \
     PutUpdateBoardQueryParameters as Put
 
 

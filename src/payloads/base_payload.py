@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.enums.query_parameters.base_query_parameter import BaseQueryParameter
+from enums.query_parameters.base_query_parameter import BaseQueryParameter
 
 
 class BasePayload:

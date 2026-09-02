@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.payloads.base_payload import BasePayload
-from src.enums.query_parameters.labels.label_base_query_parameters import \
+from payloads.base_payload import BasePayload
+from enums.query_parameters.labels.label_base_query_parameters import \
     LabelBaseQueryParameters as Base
 
 

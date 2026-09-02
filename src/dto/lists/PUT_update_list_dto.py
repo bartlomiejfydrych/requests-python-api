@@ -14,4 +14,9 @@ class PutUpdateListDto(ListBaseDto):
     # FIELDS – VALIDATION CONSTRAINTS
     # ==========================================================================================================
 
-    subscribed: bool | None
+    # NOTE FOR ME:
+    # Java: "subscribed" jest zwykłym polem @JsonProperty POZA konstruktorem @JsonCreator (bez
+    # required=true) -> w pełni opcjonalne, Trello zwraca ten klucz tylko wtedy, gdy był częścią
+    # payloadu PUT (np. przy zmianie tylko "pos"/"name"/"idBoard" klucz "subscribed" w ogóle nie
+    # występuje w odpowiedzi).
+    subscribed: bool | None = None

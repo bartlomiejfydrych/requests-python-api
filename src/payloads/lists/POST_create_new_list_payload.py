@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.payloads.base_payload import BasePayload
-from src.enums.query_parameters.lists.lists.list_base_query_parameters import \
+from payloads.base_payload import BasePayload
+from enums.query_parameters.lists.lists.list_base_query_parameters import \
     ListBaseQueryParameters as Base
-from src.enums.query_parameters.lists.lists.POST_create_new_list_query_parameters import \
+from enums.query_parameters.lists.lists.POST_create_new_list_query_parameters import \
     PostCreateNewListQueryParameters as Post
 
 
@@ -29,7 +29,7 @@ class PostCreateNewListPayload(BasePayload):
         self.put_if_not_null(params, Base.NAME, self.name)
         self.put_if_not_null(params, Base.ID_BOARD, self.id_board)
         self.put_if_not_null(params, Post.ID_LIST_SOURCE, self.id_list_source)
-        self.put_if_not_null(params, Post.POS, self.pos)
+        self.put_if_not_null(params, Base.POS, self.pos)
 
         return params
 
