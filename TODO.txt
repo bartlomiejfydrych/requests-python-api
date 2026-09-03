@@ -1,18 +1,6 @@
-PRZEPISANE SEKCJE:
-
-– dto
-– endpoints
-– enums
-– exceptions
-– expected_responses
-– payloads
-– utils
-– utils_tests
-– tests
-– testy jednostkowe
-
-SEKCJE DO PRZEPISANIA:
-
 LISTA RZECZY DO ZROBIENIA:
 
-– Oddzielić testy jednostkowe od normalnych testów
+– Oddzielić testy API od testów jednostkowych
+– Zaktualizować opis README
+– Przygotować i wstawić screeny do README
+– Przeanalizować kod
