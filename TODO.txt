@@ -1,6 +1,5 @@
 LISTA RZECZY DO ZROBIENIA:
 
-– Oddzielić testy API od testów jednostkowych
 – Zaktualizować opis README
 – Przygotować i wstawić screeny do README
 – Przeanalizować kod
