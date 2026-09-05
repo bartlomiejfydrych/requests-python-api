@@ -1,5 +1,4 @@
 LISTA RZECZY DO ZROBIENIA:
 
-– Zaktualizować opis README
 – Przygotować i wstawić screeny do README
-– Przeanalizować kod
+– Przeanalizować kod i porobić notatki na zapas
