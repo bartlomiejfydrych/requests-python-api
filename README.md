@@ -288,24 +288,36 @@ By default:
 
 `pytest -m unit`
 
-## 🖼️Screenshots from project 🔴TODO
+## 🖼️Screenshots from project
+
+### Console
 
 <div align="center">
-  <img src="images/s_console.png" alt="Sample tests in the IDE console">
+  <img src="images/tests_console.png" alt="All tests in console">
+</div>
+
+### Allure
+
+#### Trello API
+
+<div align="center">
+  <img src="images/tests_allure_trello_1.png" alt="Allure report from Trello API tests 1">
 </div>
 
 <div align="center">
-  <img src="images/s_allure_1.png" alt="Allure report 1">
+  <img src="images/tests_allure_trello_2.png" alt="Allure report from Trello API tests 2">
 </div>
 
 <div align="center">
-  <img src="images/s_allure_2.png" alt="Allure report 2">
+  <img src="images/tests_allure_trello_3.png" alt="Allure report from Trello API tests 3">
+</div>
+
+#### Unit tests
+
+<div align="center">
+  <img src="images/tests_allure_unit_1.png" alt="Allure report from unit tests 1">
 </div>
 
 <div align="center">
-  <img src="images/s_allure_3.png" alt="Allure report 3">
-</div>
-
-<div align="center">
-  <img src="images/s_allure_4.png" alt="Allure report 4">
+  <img src="images/tests_allure_unit_2.png" alt="Allure report from unit tests 2">
 </div>
